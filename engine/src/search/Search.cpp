@@ -2,6 +2,7 @@
 #include "board/Board.h"
 #include "board/Check.h"
 #include "debug/log.h"
+#include "debug/validation.h"
 #include "evaluate/Evaluate.h"
 #include "evaluate/Material_Point.h"
 #include "move/Generate_Move.h"
@@ -10,6 +11,7 @@
 #include "move/Move_Order.h"
 #include "search/Search_Variables.h"
 #include "search/TT.h"
+#include "search/Zobrist.h"
 #include <chrono>
 
 const int TT_SCORE = 600000;
@@ -145,6 +147,8 @@ SearchResult Search::findBestMove(const Board& board)
 
     // make copyBoard non-const.
     Board copyBoard = board;
+
+    checkBoardState(copyBoard);
 
     // Init repetition history
     copyBoard.pushRepetitionKey();
@@ -284,6 +288,8 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
 
     for (int i = 0; i < nMoves; i++)
     {
+        ENGINE_ASSERT(alpha < beta);
+
         // time check.
         if (shouldStop())
         {
@@ -318,6 +324,8 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
             alpha = score;
             state.pv.update(ply, move);
         }
+        if (alpha >= beta)
+            break;
     }
 
     return result;
@@ -348,7 +356,6 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 
     int bestScore = -MAX_SCORE;
     BitMove bestMove = INVALID_BITMOVE;
-    bool hasMove = false;
 
     if (shouldStop())
         return TIMEOUT_SCORE;
@@ -375,14 +382,14 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     // check checkmate / stalemate
     if (nMoves == 0)
     {
-        if (isInCheck(board, board.player))
-            return -MATE_SCORE + ply;
-        else
-            return 0;
+        const int score = isInCheck(board, board.player) ? -MATE_SCORE + ply : 0;
+        return score;
     }
 
     for (int i = 0; i < nMoves; i++)
     {
+        ENGINE_ASSERT(alpha < beta);
+
         // time check.
         if (shouldStop())
             return TIMEOUT_SCORE;
@@ -437,7 +444,6 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
         {
             bestScore = score;
             bestMove = move;
-            hasMove = true;
         }
         if (score > alpha)
         {
@@ -447,7 +453,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
             state.pv.update(ply, move);
         }
 
-        if (score >= beta)
+        if (alpha >= beta)
         {
             if (!undoState[ply].isCapture)
             {
@@ -467,8 +473,8 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     else
         flag = EXACT;
 
-    storeTT(board.zobristKey, depth, ply, bestScore, flag, bestMove);
     // store to TT table.
+    storeTT(board.zobristKey, depth, ply, bestScore, flag, bestMove);
 
     return bestScore;
 }
@@ -528,6 +534,8 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
 
     for (int i = 0; i < nMoves; i++)
     {
+        ENGINE_ASSERT(alpha < beta);
+        
         // time check.
         if (shouldStop())
             return TIMEOUT_SCORE;

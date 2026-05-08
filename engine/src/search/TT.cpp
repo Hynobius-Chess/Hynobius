@@ -1,5 +1,6 @@
 #include "search/TT.h"
 #include "Type.h"
+#include "command/UCI.h"
 #include "search/Search.h"
 
 #include <assert.h>
@@ -29,11 +30,11 @@ bool probeTT(uint64_t key,
     TTOut = tt;
     moveOut = tt.bestMove;
 
-    if (score > MATE_SCORE - 1000)
+    if (score >= MATE_SCORE - 1000)
     {
         score -= ply;
     }
-    else if (score < -MATE_SCORE + 1000)
+    else if (score <= -MATE_SCORE + 1000)
     {
         score += ply;
     }
