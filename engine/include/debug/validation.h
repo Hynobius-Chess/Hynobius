@@ -5,6 +5,7 @@
 #include "board/Piece.h"
 #include "debug/log.h"
 #include "evaluate/Material_Point.h"
+#include "search/Zobrist.h"
 
 inline void checkBoardState(const Board& board)
 {
@@ -76,5 +77,8 @@ inline void checkBoardState(const Board& board)
                      " recomputed=",
                      recomputedMaterial);
     }
+
+    // zobrist key
+    ENGINE_ASSERT(computeZobrist(board) == board.zobristKey);
 #endif
 }
