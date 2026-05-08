@@ -44,16 +44,16 @@ bool probeTT(uint64_t key,
         scoreOut = score;
         return true;
     }
-    if (tt.flag == LOWER && score >= beta)
-    {
-        scoreOut = score;
-        return true;
-    }
-    if (tt.flag == UPPER && score <= alpha)
-    {
-        scoreOut = score;
-        return true;
-    }
+    // if (tt.flag == LOWER && score >= beta)
+    // {
+    //     scoreOut = score;
+    //     return true;
+    // }
+    // if (tt.flag == UPPER && score <= alpha)
+    // {
+    //     scoreOut = score;
+    //     return true;
+    // }
 
     return false;
 }
