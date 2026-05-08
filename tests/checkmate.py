@@ -105,7 +105,6 @@ def main() -> int:
     file_path = Path(args.file)
     mate_depth = int(args.mate_depth)
     detail = bool(args.detail)
-    max_testcases = int(args.max_testcases)
 
     if not engine_path.exists():
         raise FileNotFoundError(f"engine not found: {engine_path}")
@@ -113,13 +112,16 @@ def main() -> int:
         raise FileNotFoundError(f"test file not found: {file_path}")
     if mate_depth <= 0:
         raise ValueError(f"mate depth should be greater than one: {mate_depth}")
-    if not max_testcases:
-        raise ValueError("max testcases must be a interger")
     
     cases = load_mate_test(file_path, mate_depth)
 
     if not cases:
         raise ValueError(f"no mate test cases found: {file_path}")
+    
+    if (args.max_testcases):
+        max_testcases = int(args.max_testcases)
+    else:
+        max_testcases = len(cases)
 
     ok = run_test_cases(engine_path, cases, mate_depth, detail, max_testcases)
 
