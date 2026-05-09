@@ -223,12 +223,14 @@ SearchResult Search::findBestMove(const Board& board)
                 if (currentResult.bestScore <= alpha)
                 {
                     currentResult.isValid = false;
+                    state.pv = state.prevPv;
                     window *= 2;
                     continue;
                 }
                 if (currentResult.bestScore >= beta)
                 {
                     currentResult.isValid = false;
+                    state.pv = state.prevPv;
                     window *= 2;
                     continue;
                 }
