@@ -194,7 +194,7 @@ SearchResult Search::findBestMove(const Board& board)
         if (shouldStop())
             break;
 
-        SearchResult currentResult;
+        SearchResult currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
         if (depth == 1)
         {
             currentResult = chooseMove(copyBoard, depth, -MAX_SCORE, MAX_SCORE, 0, lastBestMove);
@@ -223,11 +223,13 @@ SearchResult Search::findBestMove(const Board& board)
                 if (currentResult.bestScore <= alpha)
                 {
                     window *= 2;
+                    currentResult.isValid = false;
                     continue;
                 }
                 if (currentResult.bestScore >= beta)
                 {
                     window *= 2;
+                    currentResult.isValid = false;
                     continue;
                 }
 
@@ -267,6 +269,8 @@ SearchResult Search::findBestMove(const Board& board)
 SearchResult
 Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const BitMove PVMove)
 {
+    ENGINE_ASSERT(alpha < beta);
+
     SearchResult result = {false, -MAX_SCORE, INVALID_BITMOVE};
 
     // Clear currecnt PV line
@@ -333,6 +337,8 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
 
 int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 {
+    ENGINE_ASSERT(alpha < beta);
+
     state.negamaxNodes++;
 
     // Clear current PV line
@@ -482,6 +488,8 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 // quietscence search (determine time complexity)
 int Search::quietscence(Board& board, int alpha, int beta, int ply)
 {
+    ENGINE_ASSERT(alpha < beta);
+
     state.qsNodes++;
 
     if (shouldStop())
