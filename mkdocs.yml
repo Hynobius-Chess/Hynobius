@@ -35,6 +35,7 @@ nav:
     - Optimizations:
       - Early Optimization Recode: engine\optimization\engine-improvement.md
       - History Heuristic: engine\optimization\20260503_summary.md
+      - Mate In Two Fix + Current_Result Fix: engine\optimization\20260509_230141_summary.md
 
 plugins:
   - search
