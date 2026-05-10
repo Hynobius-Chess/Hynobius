@@ -543,7 +543,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
     for (int i = 0; i < nMoves; i++)
     {
         ENGINE_ASSERT(alpha < beta);
-        
+
         // time check.
         if (shouldStop())
             return TIMEOUT_SCORE;
