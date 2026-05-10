@@ -1,6 +1,5 @@
 #include "search/TT.h"
 #include "Type.h"
-#include "command/UCI.h"
 #include "search/Search.h"
 
 #include <assert.h>
