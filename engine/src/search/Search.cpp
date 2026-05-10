@@ -201,7 +201,7 @@ SearchResult Search::findBestMove(const Board& board)
         }
         else
         {
-            int window = 128;
+            int window = 32;
 
             while (true)
             {
