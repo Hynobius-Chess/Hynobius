@@ -11,8 +11,8 @@
 #include "move/Move_Order.h"
 #include <chrono>
 
-constexpr int MATE_SCORE = 1e6;
-constexpr int TIMEOUT_SCORE = 123456789;
+constexpr int MATE_SCORE = 30000;
+constexpr int TIMEOUT_SCORE = 114514;
 constexpr int MAX_SCORE = 1e9;
 
 struct SearchResult

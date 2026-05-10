@@ -3,6 +3,7 @@
 #include "Time_Management.h"
 #include "board/Board.h"
 #include "board/Piece.h"
+#include "debug/validation.h"
 #include "fen/FEN_Parser.h"
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
@@ -12,6 +13,8 @@
 Engine::Engine()
 {
     initZobrist();
+    board.init();
+    checkBoardState(board);
 }
 
 void Engine::setStartPosition()
