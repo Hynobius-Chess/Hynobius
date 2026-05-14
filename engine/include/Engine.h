@@ -21,6 +21,7 @@ public:
 
     BitMove goDepth(int depth, bool isPrintInfo = 1);
     BitMove goClock(const TimeManage& tm);
+    BitMove goTime(const int64_t time);
     SearchResult fullInfoSearch(int depth);
     void move(Move move);
     void quit() const;

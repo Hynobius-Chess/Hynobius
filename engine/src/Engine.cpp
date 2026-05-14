@@ -8,6 +8,7 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "search/Search.h"
+#include "search/Search_Variables.h"
 #include "search/TT.h"
 #include "search/Zobrist.h"
 
@@ -66,6 +67,15 @@ BitMove Engine::goDepth(int depth, bool isPrintInfo)
 BitMove Engine::goClock(const TimeManage& tm)
 {
     Search search(eval, timeManager(tm, board.player));
+
+    auto res = search.findBestMove(board);
+
+    return res.bestBitMove;
+}
+
+BitMove Engine::goTime(const int64_t time)
+{
+    Search search(eval, {SearchVarialble::MAX_SEARCH_DEPTH, time});
 
     auto res = search.findBestMove(board);
 

@@ -84,10 +84,8 @@ void handleGo(std::istringstream& iss, Engine& engine)
         }
         if (token == "movetime")
         {
-            uint64_t time;
-            iss >> time;
-            tm.wtime = time;
-            tm.btime = time;
+            iss >> limit.movetime;
+            limit.isMoveTime = true;
         }
         if (token == "perft")
         {
@@ -118,7 +116,12 @@ void handleGo(std::istringstream& iss, Engine& engine)
 
     BitMove move;
 
-    if (tm.depth != -1)
+    if (limit.isMoveTime)
+    {
+        move = engine.goTime(limit.movetime);
+    }
+
+    else if (tm.depth != -1)
     {
         move = engine.goDepth(tm.depth);
     }
