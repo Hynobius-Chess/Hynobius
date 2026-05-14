@@ -8,6 +8,7 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "search/Search.h"
+#include "search/TT.h"
 #include "search/Zobrist.h"
 
 Engine::Engine()
@@ -83,5 +84,9 @@ void Engine::quit() const {}
 
 void Engine::newGame()
 {
-    // Do nothing for now.
+    board.init();
+    for (int i = 0; i < TT_SIZE; i++)
+    {
+        TT[i] = {};
+    }
 }
