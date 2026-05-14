@@ -136,6 +136,7 @@ Search::Search(const Evaluate& _eval, const SearchLimits _limits)
 {
     eval = _eval;
     limits = _limits;
+    state.reset();
 }
 
 // public function to search for moves.
@@ -153,8 +154,10 @@ SearchResult Search::findBestMove(const Board& board)
     copyBoard.pushRepetitionKey();
 
     // current result is invalid
-    SearchResult result = {false, -MAX_SCORE, INVALID_BITMOVE};
-
+    SearchResult result;
+    result.clear();
+    result = {false, -MAX_SCORE, INVALID_BITMOVE};
+    
     // At least output a valid move
     BitMove rootMoves[256];
     const int nRootMoves = generateAllLegalMoves(copyBoard, rootMoves);
@@ -193,7 +196,10 @@ SearchResult Search::findBestMove(const Board& board)
         if (shouldStop())
             break;
 
-        SearchResult currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
+        SearchResult currentResult;
+        currentResult.clear();
+        currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};;
+
         if (depth == 1)
         {
             currentResult = chooseMove(copyBoard, depth, -MAX_SCORE, MAX_SCORE, 0, lastBestMove);
@@ -345,6 +351,9 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 
     state.stats.negamaxNodes++;
 
+    // Record original alpha for TT store.
+    const int oriAlpha = alpha;
+
     // Clear current PV line
     state.pv.clearLine(ply);
 
@@ -356,13 +365,18 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     TTEntry ttOut;
     int ttScore = -MAX_SCORE;
     BitMove ttMove = INVALID_BITMOVE;
-    if (probeTT(board.zobristKey, depth, alpha, beta, ply, ttOut, ttScore, ttMove) == true)
+    bool isHit = false;
+
+    state.stats.ttProbe++;
+    if (probeTT(board.zobristKey, depth, oriAlpha, beta, ply, ttOut, ttScore, ttMove, isHit) == true)
     {
+        state.stats.ttHits++;
+        state.stats.ttCuts++;
         return ttScore;
     }
 
-    // Record original alpha for TT store.
-    const int oriAlpha = alpha;
+    if (isHit)
+        state.stats.ttHits++;
 
     int bestScore = -MAX_SCORE;
     BitMove bestMove = INVALID_BITMOVE;
@@ -475,7 +489,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
                 state.stats.betaCutsFirst++;
             
             state.stats.betaCuts++;
-            
+
             break;
         }
     }
