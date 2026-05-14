@@ -43,6 +43,25 @@ struct SearchStats
     {
         return negamaxNodes + qsNodes;
     }
+
+    void print()
+    {
+        std::cout << "depth=" << depth;
+        std::cout << " negamaxnodes=" << negamaxNodes;
+        std::cout << " qsnodes=" << qsNodes;
+        std::cout << " totalnodes=" << totalNodes();
+        std::cout << " time=" << timeMs;
+        std::cout << " nps=" << (timeMs > 0 ? totalNodes() * 1000 / timeMs : 0);
+        std::cout << " betacuts=" << betaCuts;
+        std::cout << " firstbetacuts=" << betaCutsFirst;
+        std::cout << " firstbetacutrate=" << std::fixed << std::setprecision(4) << (betaCuts > 0 ? (double)betaCutsFirst * 100 / betaCuts : 0);
+        std::cout << " ttprobe=" << ttProbe;
+        std::cout << " tthits=" << ttHits;
+        std::cout << " ttcuts=" << ttCuts;
+        std::cout << " ttcut_hit_rate=" << std::fixed << std::setprecision(4) << (ttHits > 0 ? (double)ttCuts * 100 / ttHits : 0);
+        std::cout << " ttcut_negamaxnodes_rate=" << std::fixed << std::setprecision(4) << (negamaxNodes > 0 ? (double)ttCuts * 100 / negamaxNodes : 0);
+        std::cout << '\n' << std::flush;
+    }
 };
 
 struct SearchResult
@@ -54,6 +73,11 @@ struct SearchResult
     SearchStats stats;
 
     PVTable pv;
+
+    void clear()
+    {
+        *this = SearchResult{};
+    }
 };
 
 struct SearchLimits
@@ -84,6 +108,7 @@ struct SearchContext
         stopped = false;
         timeout = false;
         startTime = std::chrono::steady_clock::now();
+        stats.clear();
     }
 };
 
