@@ -15,11 +15,45 @@ constexpr int MATE_SCORE = 30000;
 constexpr int TIMEOUT_SCORE = 114514;
 constexpr int MAX_SCORE = 1e9;
 
+struct SearchStats
+{
+    int64_t depth;
+    int score;
+    int64_t negamaxNodes;
+    int64_t qsNodes;
+    int64_t timeMs;
+    int64_t nps;
+
+    int64_t ttProbe;
+    int64_t ttHits;
+    int64_t ttCuts;
+
+    int64_t betaCuts;
+    int64_t betaCutsFirst;
+
+    int64_t failHighs;
+    int64_t failHighsFirst;
+
+    void clear()
+    {
+        *this = SearchStats{};
+    }
+
+    int64_t totalNodes()
+    {
+        return negamaxNodes + qsNodes;
+    }
+};
+
 struct SearchResult
 {
     bool isValid = 0;
     int bestScore;
     BitMove bestBitMove = INVALID_BITMOVE;
+
+    SearchStats stats;
+
+    PVTable pv;
 };
 
 struct SearchLimits
@@ -28,10 +62,29 @@ struct SearchLimits
     int64_t maxTimeMs = -1;
 };
 
-struct SearchInfo
+struct SearchContext
 {
-    int64_t depth, score, nodes, qsnodes, timeMs, nps;
-    PVTable pv;
+    bool stopped = false;
+    bool timeout = false;
+
+    std::chrono::steady_clock::time_point startTime;
+
+    PVTable pv, prevPv;
+
+    killerMove kill;
+
+    HistoryHeuristic history;
+
+    int prevScore = 0;
+
+    SearchStats stats;
+
+    void reset()
+    {
+        stopped = false;
+        timeout = false;
+        startTime = std::chrono::steady_clock::now();
+    }
 };
 
 class Search
@@ -54,30 +107,15 @@ private:
 
     int quietscence(Board& board, const int alpha, const int beta, const int ply);
 
+    void printInfo();
+
     SearchLimits limits;
+
+    SearchContext state;
 
     UndoState undoState[SearchVarialble::MAX_PLY + 5];
 
     BitMove moveBuffer[SearchVarialble::MAX_PLY + 5][256] = {INVALID_BITMOVE};
-
-    struct SearchState
-    {
-        bool stopped = false;
-        bool timeout = false;
-
-        uint64_t negamaxNodes = 0;
-        uint64_t qsNodes = 0;
-
-        std::chrono::steady_clock::time_point startTime;
-
-        PVTable pv, prevPv;
-
-        killerMove kill;
-
-        HistoryHeuristic history;
-
-        int prevScore = 0;
-    } state;
 
     bool shouldStop();
 
