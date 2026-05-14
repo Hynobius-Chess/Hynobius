@@ -5,3 +5,10 @@
 void uciLoop(Engine& engine);
 
 std::string UCIMoveToString(const Move& move);
+
+struct UCIGoLimit
+{
+    bool isPerft = false;
+    bool isBench = false;
+    bool isSpeedTest = false;
+};

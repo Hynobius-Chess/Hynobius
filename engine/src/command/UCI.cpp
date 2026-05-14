@@ -4,6 +4,7 @@
 #include "command/UCI_Move_Parcer.h"
 #include "move/Move.h"
 #include "pgn/Pgn_Transformer.h"
+#include "debug/perft.h"
 
 #include <iostream>
 #include <sstream>
@@ -57,6 +58,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
 {
     TimeManage tm;
     std::string token;
+    UCIGoLimit limit;
 
     while (iss >> token)
     {
@@ -87,6 +89,31 @@ void handleGo(std::istringstream& iss, Engine& engine)
             tm.wtime = time;
             tm.btime = time;
         }
+        if (token == "perft")
+        {
+            limit.isPerft = true;
+            iss >> tm.depth;
+        }
+    }
+
+    if (limit.isPerft)
+    {
+        if (tm.depth <= 0)
+        {
+            std::cout << "info string error: perft requires a depth\n" << std::flush;
+            return;
+        }
+
+        PerftStats stats = perftWithStat(engine.board, tm.depth);
+
+        std::cout << "nodes=" << stats.nodes;
+        std::cout << " captures=" << stats.captures;
+        std::cout << " enPassants=" << stats.enPassants;
+        std::cout << " castles=" << stats.castles;
+        std::cout << " promotions=" << stats.promotions;
+        std::cout << " checks=" << stats.checks << '\n' << std::flush;
+
+        return;
     }
 
     BitMove move;
