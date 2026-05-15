@@ -2,9 +2,9 @@
 #include "Structure_IO.h"
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
+#include "debug/perft.h"
 #include "move/Move.h"
 #include "pgn/Pgn_Transformer.h"
-#include "debug/perft.h"
 #include "search/Search.h"
 
 #include <chrono>
@@ -191,7 +191,7 @@ void handleBench(std::istringstream& iss, Engine& engine)
 
     bool isPerft = false; // TODO
     int depth = -1;
-    
+
     while (iss >> token)
     {
         if (token == "depth")
@@ -207,14 +207,14 @@ void handleBench(std::istringstream& iss, Engine& engine)
     }
 
     std::vector<std::string> fen = {
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", // startpos
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",             // startpos
         "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", // kiwipipe
-        "q3k3/p1p5/2pb2r1/4ppp1/2N2r2/1Q2N2b/PPP2P1P/1R2R1K1 w - - 4 27", // middle game
-        "r4rk1/ppp2ppp/1n3q2/2Pp4/1n1P4/1P2BP1B/P4P1P/R2Q1RK1 b - - 0 15", // middle game
+        "q3k3/p1p5/2pb2r1/4ppp1/2N2r2/1Q2N2b/PPP2P1P/1R2R1K1 w - - 4 27",       // middle game
+        "r4rk1/ppp2ppp/1n3q2/2Pp4/1n1P4/1P2BP1B/P4P1P/R2Q1RK1 b - - 0 15",      // middle game
         "r2q2r1/p1p1pk1p/1pn2ppb/2Nn1b2/3P4/5NB1/PPP1QPPP/1K1R1B1R w - - 0 14", // middle game
-        "8/1Br2k2/4p1p1/4P1Pp/pprP1n1P/8/1P1R1P2/3R2K1 w - - 2 35", // endgame
-        "8/3p2p1/4p3/4Pk1p/2p4P/P1b5/P5P1/1R5K w - - 0 49", // endgame
-        "4r1k1/1pR2pp1/7p/1P2rP2/P4K1P/3R2P1/8/8 b - - 0 43", // endgame
+        "8/1Br2k2/4p1p1/4P1Pp/pprP1n1P/8/1P1R1P2/3R2K1 w - - 2 35",             // endgame
+        "8/3p2p1/4p3/4Pk1p/2p4P/P1b5/P5P1/1R5K w - - 0 49",                     // endgame
+        "4r1k1/1pR2pp1/7p/1P2rP2/P4K1P/3R2P1/8/8 b - - 0 43",                   // endgame
     };
 
     SearchStats totalStats;
@@ -231,14 +231,14 @@ void handleBench(std::istringstream& iss, Engine& engine)
     }
 
     auto endTime = std::chrono::steady_clock::now();
-    int64_t time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    int64_t time =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
     std::cout << "\n---------\n\n";
     std::cout << "totalnodes=" << totalNodes;
     std::cout << " timeMs=" << time;
     std::cout << " nps=" << (time > 0 ? totalNodes * 1000 / time : 0);
     std::cout << '\n' << std::flush;
-
 }
 
 void uciLoop(Engine& engine)

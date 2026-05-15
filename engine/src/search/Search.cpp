@@ -82,7 +82,8 @@ void Search::printInfo()
         std::cout << " score cp " << state.stats.score;
     }
 
-    std::cout << " nodes " << state.stats.totalNodes() << " nps " << state.stats.nps << " time " << state.stats.timeMs;
+    std::cout << " nodes " << state.stats.totalNodes() << " nps " << state.stats.nps << " time "
+              << state.stats.timeMs;
 
     std::cout << " pv ";
     const int pvLength = state.pv.length[0];
@@ -157,7 +158,7 @@ SearchResult Search::findBestMove(const Board& board)
     SearchResult result;
     result.clear();
     result = {false, -MAX_SCORE, INVALID_BITMOVE};
-    
+
     // At least output a valid move
     BitMove rootMoves[256];
     const int nRootMoves = generateAllLegalMoves(copyBoard, rootMoves);
@@ -198,7 +199,8 @@ SearchResult Search::findBestMove(const Board& board)
 
         SearchResult currentResult;
         currentResult.clear();
-        currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};;
+        currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
+        ;
 
         if (depth == 1)
         {
@@ -255,8 +257,10 @@ SearchResult Search::findBestMove(const Board& board)
 
             auto now = std::chrono::steady_clock::now();
             state.stats.timeMs =
-                std::chrono::duration_cast<std::chrono::milliseconds>(now - state.startTime).count();
-            state.stats.nps = (state.stats.timeMs > 0 ? state.stats.totalNodes() * 1000 / state.stats.timeMs : 0);
+                std::chrono::duration_cast<std::chrono::milliseconds>(now - state.startTime)
+                    .count();
+            state.stats.nps =
+                (state.stats.timeMs > 0 ? state.stats.totalNodes() * 1000 / state.stats.timeMs : 0);
 
             printInfo();
 
@@ -336,7 +340,7 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         {
             if (i == 0)
                 state.stats.betaCutsFirst++;
-            
+
             state.stats.betaCuts++;
             break;
         }
@@ -367,7 +371,18 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     BitMove ttMove = INVALID_BITMOVE;
 
     state.stats.ttProbe++;
-    if (probeTT(board.zobristKey, depth, oriAlpha, beta, ply, ttOut, ttScore, ttMove, state.stats.ttHits, state.stats.ttLower, state.stats.ttUpper, state.stats.ttExact) == true)
+    if (probeTT(board.zobristKey,
+                depth,
+                oriAlpha,
+                beta,
+                ply,
+                ttOut,
+                ttScore,
+                ttMove,
+                state.stats.ttHits,
+                state.stats.ttLower,
+                state.stats.ttUpper,
+                state.stats.ttExact) == true)
     {
         state.stats.ttCuts++;
         return ttScore;
@@ -482,7 +497,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 
             if (i == 0)
                 state.stats.betaCutsFirst++;
-            
+
             state.stats.betaCuts++;
 
             break;

@@ -18,8 +18,7 @@ bool probeTT(uint64_t key,
              int64_t& hitCounter,
              int64_t& lowerCounter,
              int64_t& upperCounter,
-             int64_t& exactCounter
-            )
+             int64_t& exactCounter)
 {
     TTEntry& tt = TT[TTIndex(key)];
 
