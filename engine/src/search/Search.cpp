@@ -365,18 +365,13 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     TTEntry ttOut;
     int ttScore = -MAX_SCORE;
     BitMove ttMove = INVALID_BITMOVE;
-    bool isHit = false;
 
     state.stats.ttProbe++;
-    if (probeTT(board.zobristKey, depth, oriAlpha, beta, ply, ttOut, ttScore, ttMove, isHit) == true)
+    if (probeTT(board.zobristKey, depth, oriAlpha, beta, ply, ttOut, ttScore, ttMove, state.stats.ttHits, state.stats.ttLower, state.stats.ttUpper, state.stats.ttExact) == true)
     {
-        state.stats.ttHits++;
         state.stats.ttCuts++;
         return ttScore;
     }
-
-    if (isHit)
-        state.stats.ttHits++;
 
     int bestScore = -MAX_SCORE;
     BitMove bestMove = INVALID_BITMOVE;

@@ -15,7 +15,10 @@ bool probeTT(uint64_t key,
              TTEntry& TTOut,
              int& scoreOut,
              BitMove& moveOut,
-             bool& hitOut
+             int64_t& hitCounter,
+             int64_t& lowerCounter,
+             int64_t& upperCounter,
+             int64_t& exactCounter
             )
 {
     TTEntry& tt = TT[TTIndex(key)];
@@ -27,7 +30,8 @@ bool probeTT(uint64_t key,
     if (tt.depth < depth)
         return false;
 
-    hitOut = true;
+    hitCounter++;
+
     int score = tt.score;
     TTOut = tt;
     moveOut = tt.bestMove;
@@ -43,16 +47,20 @@ bool probeTT(uint64_t key,
 
     if (tt.flag == EXACT)
     {
+        exactCounter++;
+
         scoreOut = score;
         return true;
     }
     if (tt.flag == LOWER && score >= beta)
     {
+        lowerCounter++;
         scoreOut = score;
         return true;
     }
     if (tt.flag == UPPER && score <= alpha)
     {
+        upperCounter++;
         scoreOut = score;
         return true;
     }

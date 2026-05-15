@@ -27,6 +27,9 @@ struct SearchStats
     int64_t ttProbe;
     int64_t ttHits;
     int64_t ttCuts;
+    int64_t ttLower;
+    int64_t ttUpper;
+    int64_t ttExact;
 
     int64_t betaCuts;
     int64_t betaCutsFirst;
@@ -58,6 +61,9 @@ struct SearchStats
         std::cout << " ttprobe=" << ttProbe;
         std::cout << " tthits=" << ttHits;
         std::cout << " ttcuts=" << ttCuts;
+        std::cout << " ttLower=" << ttLower;
+        std::cout << " ttUpper=" << ttUpper;
+        std::cout << " ttExact=" << ttExact;
         std::cout << " ttcut_hit_rate=" << std::fixed << std::setprecision(4) << (ttHits > 0 ? (double)ttCuts * 100 / ttHits : 0);
         std::cout << " ttcut_negamaxnodes_rate=" << std::fixed << std::setprecision(4) << (negamaxNodes > 0 ? (double)ttCuts * 100 / negamaxNodes : 0);
         std::cout << '\n' << std::flush;

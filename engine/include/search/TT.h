@@ -37,7 +37,10 @@ bool probeTT(const uint64_t key,
              TTEntry& TTOut,
              int& scoreOut,
              BitMove& moveOut,
-             bool &hitOut
+             int64_t& hitCounter,
+             int64_t& lowerCounter,
+             int64_t& upperCounter,
+             int64_t& exactCounter
             );
 
 void storeTT(const uint64_t key,
