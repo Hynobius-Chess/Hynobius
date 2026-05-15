@@ -7,9 +7,7 @@
 #include "debug/perft.h"
 #include "search/Search.h"
 
-#include <algorithm>
 #include <chrono>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
