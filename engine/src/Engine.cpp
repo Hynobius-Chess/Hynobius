@@ -8,6 +8,8 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "search/Search.h"
+#include "search/Search_Variables.h"
+#include "search/TT.h"
 #include "search/Zobrist.h"
 
 Engine::Engine()
@@ -71,6 +73,15 @@ BitMove Engine::goClock(const TimeManage& tm)
     return res.bestBitMove;
 }
 
+BitMove Engine::goTime(const int64_t time)
+{
+    Search search(eval, {SearchVarialble::MAX_SEARCH_DEPTH, time});
+
+    auto res = search.findBestMove(board);
+
+    return res.bestBitMove;
+}
+
 SearchResult Engine::fullInfoSearch(int depth)
 {
     Search search(eval, {depth, MAX_THINK_TIME});
@@ -83,5 +94,9 @@ void Engine::quit() const {}
 
 void Engine::newGame()
 {
-    // Do nothing for now.
+    board.init();
+    for (int i = 0; i < TT_SIZE; i++)
+    {
+        TT[i] = {};
+    }
 }

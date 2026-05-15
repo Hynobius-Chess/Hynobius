@@ -47,7 +47,7 @@
 
         engine/src/command/UCI.cpp
         engine/src/command/UCI_Move_Parser.cpp
-        engine/src/command/CLI/CLI.cpp
+        engine/src/command/CLI.cpp
 
         engine/src/Engine.cpp
         engine/src/Time_Management.cpp

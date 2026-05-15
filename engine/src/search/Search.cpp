@@ -11,7 +11,6 @@
 #include "move/Move_Order.h"
 #include "search/Search_Variables.h"
 #include "search/TT.h"
-#include "search/Zobrist.h"
 #include <chrono>
 
 const int TT_SCORE = 600000;
@@ -64,32 +63,33 @@ int Search::scoreMove(const Board& board, const BitMove move, const advanceMoves
     return score;
 }
 
-void printInfo(const SearchInfo& info)
+void Search::printInfo()
 {
-    std::cout << "info depth " << info.depth;
+    std::cout << "info depth " << state.stats.depth;
 
-    if (info.score >= MATE_SCORE - SearchVarialble::MAX_SEARCH_DEPTH)
+    if (state.stats.score >= MATE_SCORE - SearchVarialble::MAX_SEARCH_DEPTH)
     {
-        const int mate = (MATE_SCORE - info.score + 1) / 2;
+        const int mate = (MATE_SCORE - state.stats.score + 1) / 2;
         std::cout << " score mate " << mate;
     }
-    else if (info.score <= -MATE_SCORE + SearchVarialble::MAX_SEARCH_DEPTH)
+    else if (state.stats.score <= -MATE_SCORE + SearchVarialble::MAX_SEARCH_DEPTH)
     {
-        const int mate = (MATE_SCORE + info.score + 1) / 2;
+        const int mate = (MATE_SCORE + state.stats.score + 1) / 2;
         std::cout << " score mate -" << mate;
     }
     else
     {
-        std::cout << " score cp " << info.score;
+        std::cout << " score cp " << state.stats.score;
     }
 
-    std::cout << " nodes " << info.nodes << " nps " << info.nps << " time " << info.timeMs;
+    std::cout << " nodes " << state.stats.totalNodes() << " nps " << state.stats.nps << " time "
+              << state.stats.timeMs;
 
     std::cout << " pv ";
-    const int pvLength = info.pv.length[0];
+    const int pvLength = state.pv.length[0];
     for (int i = 0; i < pvLength; i++)
     {
-        std::cout << bitMoveToUCIMove(info.pv.table[0][i]) << ' ';
+        std::cout << bitMoveToUCIMove(state.pv.table[0][i]) << ' ';
     }
 
     std::cout << '\n';
@@ -112,7 +112,7 @@ bool Search::shouldStop()
     else
         interval = 1024;
 
-    if (((state.negamaxNodes + state.qsNodes) & (interval - 1)) != 0)
+    if (((state.stats.negamaxNodes + state.stats.qsNodes) & (interval - 1)) != 0)
         return false;
 
     if (limits.maxTimeMs != -1)
@@ -137,13 +137,14 @@ Search::Search(const Evaluate& _eval, const SearchLimits _limits)
 {
     eval = _eval;
     limits = _limits;
+    state.reset();
 }
 
 // public function to search for moves.
 SearchResult Search::findBestMove(const Board& board)
 {
     // init state.
-    state = {false, false, 0, 0, std::chrono::steady_clock::now()};
+    state.reset();
 
     // make copyBoard non-const.
     Board copyBoard = board;
@@ -154,7 +155,9 @@ SearchResult Search::findBestMove(const Board& board)
     copyBoard.pushRepetitionKey();
 
     // current result is invalid
-    SearchResult result = {false, -MAX_SCORE, INVALID_BITMOVE};
+    SearchResult result;
+    result.clear();
+    result = {false, -MAX_SCORE, INVALID_BITMOVE};
 
     // At least output a valid move
     BitMove rootMoves[256];
@@ -194,7 +197,11 @@ SearchResult Search::findBestMove(const Board& board)
         if (shouldStop())
             break;
 
-        SearchResult currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
+        SearchResult currentResult;
+        currentResult.clear();
+        currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
+        ;
+
         if (depth == 1)
         {
             currentResult = chooseMove(copyBoard, depth, -MAX_SCORE, MAX_SCORE, 0, lastBestMove);
@@ -240,25 +247,26 @@ SearchResult Search::findBestMove(const Board& board)
         if (currentResult.isValid)
         {
             result = currentResult;
-            lastBestMove = result.bestBitMove;
+            lastBestMove = currentResult.bestBitMove;
             state.prevPv = state.pv;
-            state.prevScore = result.bestScore;
+            state.prevScore = currentResult.bestScore;
+
+            // print info
+            state.stats.depth = depth;
+            state.stats.score = currentResult.bestScore;
+
+            auto now = std::chrono::steady_clock::now();
+            state.stats.timeMs =
+                std::chrono::duration_cast<std::chrono::milliseconds>(now - state.startTime)
+                    .count();
+            state.stats.nps =
+                (state.stats.timeMs > 0 ? state.stats.totalNodes() * 1000 / state.stats.timeMs : 0);
+
+            printInfo();
+
+            result.stats = state.stats;
+            result.pv = state.pv;
         }
-
-        // print info
-        SearchInfo info;
-        info.depth = depth;
-        info.score = result.bestScore;
-        info.nodes = state.negamaxNodes + state.qsNodes;
-        info.qsnodes = state.qsNodes;
-
-        auto now = std::chrono::steady_clock::now();
-        info.timeMs =
-            std::chrono::duration_cast<std::chrono::milliseconds>(now - state.startTime).count();
-        info.nps = (info.timeMs > 0 ? info.nodes * 1000 / info.timeMs : 0);
-        info.pv = state.pv;
-
-        printInfo(info);
     }
 
     copyBoard.popRepetitionKey();
@@ -329,7 +337,13 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
             state.pv.update(ply, move);
         }
         if (alpha >= beta)
+        {
+            if (i == 0)
+                state.stats.betaCutsFirst++;
+
+            state.stats.betaCuts++;
             break;
+        }
     }
 
     return result;
@@ -339,7 +353,10 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 {
     ENGINE_ASSERT(alpha < beta);
 
-    state.negamaxNodes++;
+    state.stats.negamaxNodes++;
+
+    // Record original alpha for TT store.
+    const int oriAlpha = alpha;
 
     // Clear current PV line
     state.pv.clearLine(ply);
@@ -352,13 +369,24 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     TTEntry ttOut;
     int ttScore = -MAX_SCORE;
     BitMove ttMove = INVALID_BITMOVE;
-    if (probeTT(board.zobristKey, depth, alpha, beta, ply, ttOut, ttScore, ttMove) == true)
+
+    state.stats.ttProbe++;
+    if (probeTT(board.zobristKey,
+                depth,
+                oriAlpha,
+                beta,
+                ply,
+                ttOut,
+                ttScore,
+                ttMove,
+                state.stats.ttHits,
+                state.stats.ttLower,
+                state.stats.ttUpper,
+                state.stats.ttExact) == true)
     {
+        state.stats.ttCuts++;
         return ttScore;
     }
-
-    // Record original alpha for TT store.
-    const int oriAlpha = alpha;
 
     int bestScore = -MAX_SCORE;
     BitMove bestMove = INVALID_BITMOVE;
@@ -466,6 +494,12 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
                 state.kill.addKillerMove(move, ply);
                 state.history.updateHisroty(undoState[ply].player, move, depth);
             }
+
+            if (i == 0)
+                state.stats.betaCutsFirst++;
+
+            state.stats.betaCuts++;
+
             break;
         }
     }
@@ -490,7 +524,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
 {
     ENGINE_ASSERT(alpha < beta);
 
-    state.qsNodes++;
+    state.stats.qsNodes++;
 
     if (shouldStop())
         return TIMEOUT_SCORE;

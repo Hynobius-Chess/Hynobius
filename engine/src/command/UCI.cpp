@@ -2,9 +2,12 @@
 #include "Structure_IO.h"
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
+#include "debug/perft.h"
 #include "move/Move.h"
 #include "pgn/Pgn_Transformer.h"
+#include "search/Search.h"
 
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -57,6 +60,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
 {
     TimeManage tm;
     std::string token;
+    UCIGoLimit limit;
 
     while (iss >> token)
     {
@@ -82,16 +86,44 @@ void handleGo(std::istringstream& iss, Engine& engine)
         }
         if (token == "movetime")
         {
-            uint64_t time;
-            iss >> time;
-            tm.wtime = time;
-            tm.btime = time;
+            iss >> limit.movetime;
+            limit.isMoveTime = true;
         }
+        if (token == "perft")
+        {
+            limit.isPerft = true;
+            iss >> tm.depth;
+        }
+    }
+
+    if (limit.isPerft)
+    {
+        if (tm.depth <= 0)
+        {
+            std::cout << "info string error: perft requires a depth\n" << std::flush;
+            return;
+        }
+
+        PerftStats stats = perftWithStat(engine.board, tm.depth);
+
+        std::cout << "nodes=" << stats.nodes;
+        std::cout << " captures=" << stats.captures;
+        std::cout << " enPassants=" << stats.enPassants;
+        std::cout << " castles=" << stats.castles;
+        std::cout << " promotions=" << stats.promotions;
+        std::cout << " checks=" << stats.checks << '\n' << std::flush;
+
+        return;
     }
 
     BitMove move;
 
-    if (tm.depth != -1)
+    if (limit.isMoveTime)
+    {
+        move = engine.goTime(limit.movetime);
+    }
+
+    else if (tm.depth != -1)
     {
         move = engine.goDepth(tm.depth);
     }
@@ -156,15 +188,61 @@ void handlePosition(std::istringstream& iss, Engine& engine)
 void handleBench(std::istringstream& iss, Engine& engine)
 {
     std::string token;
-    iss >> token;
-    // TODO
+
+    bool isPerft = false; // TODO
+    int depth = -1;
+
+    while (iss >> token)
+    {
+        if (token == "depth")
+        {
+            iss >> depth;
+        }
+    }
+
+    if (depth <= 0)
+    {
+        std::cout << "info string error: bench requires a depth\n" << std::flush;
+        return;
+    }
+
+    std::vector<std::string> fen = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",             // startpos
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", // kiwipipe
+        "q3k3/p1p5/2pb2r1/4ppp1/2N2r2/1Q2N2b/PPP2P1P/1R2R1K1 w - - 4 27",       // middle game
+        "r4rk1/ppp2ppp/1n3q2/2Pp4/1n1P4/1P2BP1B/P4P1P/R2Q1RK1 b - - 0 15",      // middle game
+        "r2q2r1/p1p1pk1p/1pn2ppb/2Nn1b2/3P4/5NB1/PPP1QPPP/1K1R1B1R w - - 0 14", // middle game
+        "8/1Br2k2/4p1p1/4P1Pp/pprP1n1P/8/1P1R1P2/3R2K1 w - - 2 35",             // endgame
+        "8/3p2p1/4p3/4Pk1p/2p4P/P1b5/P5P1/1R5K w - - 0 49",                     // endgame
+        "4r1k1/1pR2pp1/7p/1P2rP2/P4K1P/3R2P1/8/8 b - - 0 43",                   // endgame
+    };
+
+    SearchStats totalStats;
+    auto startTime = std::chrono::steady_clock::now();
+    int64_t totalNodes = 0;
+
+    for (int i = 0; i < (int)fen.size(); i++)
+    {
+        engine.newGame();
+        engine.setPositionWithFen(fen[i]);
+        SearchResult result = engine.fullInfoSearch(depth);
+        result.stats.print();
+        totalNodes += result.stats.totalNodes();
+    }
+
+    auto endTime = std::chrono::steady_clock::now();
+    int64_t time =
+        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+
+    std::cout << "\n---------\n\n";
+    std::cout << "totalnodes=" << totalNodes;
+    std::cout << " timeMs=" << time;
+    std::cout << " nps=" << (time > 0 ? totalNodes * 1000 / time : 0);
+    std::cout << '\n' << std::flush;
 }
 
 void uciLoop(Engine& engine)
 {
-    std::cout << "id name engine1\nid author EmmetThor\n";
-    std::cout << "uciok\n" << std::flush;
-
     std::string line;
     while (std::getline(std::cin, line))
     {
@@ -174,7 +252,7 @@ void uciLoop(Engine& engine)
 
         if (token == "uci")
         {
-            std::cout << "id name engine1\nid author EmmetThor\n";
+            std::cout << "id name Hynobius 0.3beta\nid author EmmetThor\n";
             std::cout << "uciok\n" << std::flush;
         }
         else if (token == "isready")
@@ -189,11 +267,15 @@ void uciLoop(Engine& engine)
         {
             handleGo(iss, engine);
         }
+        else if (token == "bench")
+        {
+            handleBench(iss, engine);
+        }
         else if (token == "quit" || token == "stop")
         {
             break;
         }
-        else if (token == "PRINTBOARD")
+        else if (token == "d")
         {
             std::cout << engine.board << '\n';
         }

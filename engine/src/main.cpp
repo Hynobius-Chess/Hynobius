@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "command/CLI/CLI.h"
+#include "command/CLI.h"
 #include "command/UCI.h"
 
 int main(int argc, char* argv[])
