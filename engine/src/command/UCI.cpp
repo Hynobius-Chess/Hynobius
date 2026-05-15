@@ -243,9 +243,6 @@ void handleBench(std::istringstream& iss, Engine& engine)
 
 void uciLoop(Engine& engine)
 {
-    std::cout << "id name engine1\nid author EmmetThor\n";
-    std::cout << "uciok\n" << std::flush;
-
     std::string line;
     while (std::getline(std::cin, line))
     {
@@ -255,7 +252,7 @@ void uciLoop(Engine& engine)
 
         if (token == "uci")
         {
-            std::cout << "id name engine1\nid author EmmetThor\n";
+            std::cout << "id name Hynobius 0.3beta\nid author EmmetThor\n";
             std::cout << "uciok\n" << std::flush;
         }
         else if (token == "isready")
