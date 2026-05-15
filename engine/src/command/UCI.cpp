@@ -278,7 +278,7 @@ void uciLoop(Engine& engine)
         {
             break;
         }
-        else if (token == "printboard")
+        else if (token == "d")
         {
             std::cout << engine.board << '\n';
         }
