@@ -17,7 +17,7 @@ A C++ chess engine with **tutorials**, **documents**, **scientifc testing** and 
 
 ## Overview
 
-### [Full Documents Right Here](docs/project-overview.md)
+### [Full Documents Right Here](https://hynobius-chess.github.io/docs/)
 
 ### Hynobius Chess Engine
 
