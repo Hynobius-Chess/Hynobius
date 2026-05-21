@@ -123,3 +123,7 @@ Use CLI commands
 ### AIs
 
 - **[ChatGPT (project attached)](https://chatgpt.com/g/g-p-69381984e7988191afa09bafbf015c43-c-cheng-shi-shi-zuo-xi-yang-qi-fen-xi-yin-qing/project)** with its detailed help.
+
+---
+
+Made in Taiwan :)
