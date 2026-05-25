@@ -66,7 +66,9 @@ jobs:
     name: Run tests
     needs: check
     if: needs.check.outputs.should_test == 'true'
-    uses: ./.github/workflows/run-tests.yml
+    uses: Hynobius-Chess/Hynobius-testing/.github/workflows/run_tests.yml@main
+    with:
+      engine_ref: ${{ github.sha }}
 
   format:
     needs: check
