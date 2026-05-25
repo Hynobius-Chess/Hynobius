@@ -62,6 +62,7 @@ jobs:
             "pre_release_tag=" >> $env:GITHUB_OUTPUT
           }
 
+  # directly give tesing repo workflows repo name.
   test:
     name: Run Tests
     needs: check
