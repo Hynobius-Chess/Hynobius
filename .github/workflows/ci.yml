@@ -1,4 +1,4 @@
-name: CI Controller
+name: CI
 
 on:
   push:
@@ -62,11 +62,14 @@ jobs:
             "pre_release_tag=" >> $env:GITHUB_OUTPUT
           }
 
+  # directly give testing repo workflows repo name.
   test:
-    name: Run tests
+    name: Run Tests
     needs: check
     if: needs.check.outputs.should_test == 'true'
-    uses: ./.github/workflows/run-tests.yml
+    uses: Hynobius-Chess/Hynobius-testing/.github/workflows/run_tests.yml@main
+    with:
+      engine_ref: ${{ github.sha }}
 
   format:
     needs: check

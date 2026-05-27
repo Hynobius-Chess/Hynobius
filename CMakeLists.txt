@@ -4,13 +4,11 @@
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-    # 告訴 CMake include 目錄在哪
     include_directories(engine/include)
 
     # add_definitions(-D_GLIBCXX_DEBUG)
     # add_definitions(-DENGINE_DEBUG)
 
-    # 目標檔案
     add_library(engine-core
         engine/src/board/Piece.cpp
         engine/src/board/Board.cpp
@@ -53,20 +51,6 @@
         engine/src/Time_Management.cpp
     )
 
-    # 正式引擎
     add_executable(Hynobius engine/src/main.cpp)
     target_link_libraries(Hynobius PUBLIC engine-core)
     set_target_properties(Hynobius PROPERTIES WIN32_EXECUTABLE OFF)
-
-    enable_testing()
-
-    add_executable(test-bitmove tests/Bit_Move_Correctness.cpp)
-    target_link_libraries(test-bitmove PRIVATE engine-core)
-    set_target_properties(test-bitmove PROPERTIES WIN32_EXECUTABLE OFF)
-
-    add_test(NAME BitMoveTest COMMAND test-bitmove)
-
-    # link must-have dlls
-    if (MINGW)
-        target_link_options(Hynobius PRIVATE -static -static-libgcc -static-libstdc++)
-    endif()
