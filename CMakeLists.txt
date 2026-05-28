@@ -6,8 +6,10 @@
 
     include_directories(engine/include)
 
-    # add_definitions(-D_GLIBCXX_DEBUG)
-    # add_definitions(-DENGINE_DEBUG)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_definitions(-D_GLIBCXX_DEBUG)
+        add_definitions(-DENGINE_DEBUG)
+    endif()
 
     add_library(engine-core
         engine/src/board/Piece.cpp
@@ -51,6 +53,21 @@
         engine/src/Time_Management.cpp
     )
 
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(engine-core PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Wshadow
+            -Wconversion
+            -Wsign-conversion
+            -Wuninitialized
+            -Wmaybe-uninitialized
+        )
+    endif()
+
     add_executable(Hynobius engine/src/main.cpp)
+
     target_link_libraries(Hynobius PUBLIC engine-core)
+
     set_target_properties(Hynobius PROPERTIES WIN32_EXECUTABLE OFF)
