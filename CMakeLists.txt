@@ -4,8 +4,6 @@
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-    include_directories(engine/include)
-
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_definitions(-D_GLIBCXX_DEBUG)
         add_definitions(-DENGINE_DEBUG)
@@ -51,6 +49,11 @@
 
         engine/src/Engine.cpp
         engine/src/Time_Management.cpp
+    )
+
+    target_include_directories(engine-core
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/include
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
