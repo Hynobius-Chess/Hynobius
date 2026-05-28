@@ -157,7 +157,7 @@ SearchResult Search::findBestMove(const Board& board)
     // current result is invalid
     SearchResult result;
     result.clear();
-    result = {false, -MAX_SCORE, INVALID_BITMOVE};
+    result.resetForSearch();
 
     // At least output a valid move
     BitMove rootMoves[256];
@@ -189,7 +189,6 @@ SearchResult Search::findBestMove(const Board& board)
     const int maxDepth =
         limits.maxDepth == -1 ? SearchVarialble::MAX_SEARCH_DEPTH : limits.maxDepth;
 
-    BitMove lastBestMove = INVALID_BITMOVE;
     // iterative deepening
     for (int depth = 1; depth <= maxDepth; depth++)
     {
@@ -199,12 +198,12 @@ SearchResult Search::findBestMove(const Board& board)
 
         SearchResult currentResult;
         currentResult.clear();
-        currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
+        currentResult.resetForSearch();
         ;
 
         if (depth == 1)
         {
-            currentResult = chooseMove(copyBoard, depth, -MAX_SCORE, MAX_SCORE, 0, lastBestMove);
+            currentResult = chooseMove(copyBoard, depth, -MAX_SCORE, MAX_SCORE, 0);
         }
         else
         {
@@ -219,7 +218,7 @@ SearchResult Search::findBestMove(const Board& board)
                 int alpha = state.prevScore - window;
                 int beta = state.prevScore + window;
 
-                currentResult = chooseMove(copyBoard, depth, alpha, beta, 0, lastBestMove);
+                currentResult = chooseMove(copyBoard, depth, alpha, beta, 0);
 
                 if (!currentResult.isValid)
                 {
@@ -247,7 +246,6 @@ SearchResult Search::findBestMove(const Board& board)
         if (currentResult.isValid)
         {
             result = currentResult;
-            lastBestMove = currentResult.bestBitMove;
             state.prevPv = state.pv;
             state.prevScore = currentResult.bestScore;
 
@@ -275,11 +273,12 @@ SearchResult Search::findBestMove(const Board& board)
 }
 
 SearchResult
-Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const BitMove PVMove)
+Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply)
 {
     ENGINE_ASSERT(alpha < beta);
 
-    SearchResult result = {false, -MAX_SCORE, INVALID_BITMOVE};
+    SearchResult result;
+    result.resetForSearch();
 
     // Clear currecnt PV line
     state.pv.clearLine(ply);
@@ -296,7 +295,7 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
     // sort moves
     advanceMoves adv = {
         pvMove, INVALID_BITMOVE, state.kill.table[0][ply], state.kill.table[1][ply]};
-    sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
+    sortMove(moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     for (int i = 0; i < nMoves; i++)
     {
@@ -305,7 +304,7 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         // time check.
         if (shouldStop())
         {
-            return {false, -MAX_SCORE, INVALID_BITMOVE};
+            return SearchResult::invalid();
         }
 
         const BitMove move = moves[i];
@@ -318,12 +317,10 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         board.popRepetitionKey();
         undoBitMove(board, move, undoState[ply]);
 
-        const Move oriMove = bitMovetoOriMove(board, move);
-        // std::cout << oriMove << " | " << score << '\n';
 
         if (score == -TIMEOUT_SCORE)
         {
-            return {false, -MAX_SCORE, INVALID_BITMOVE};
+            return SearchResult::invalid();
         }
         if (score > result.bestScore)
         {
@@ -411,7 +408,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 
     // Sort moves.
     advanceMoves adv = {pvMove, ttMove, state.kill.table[0][ply], state.kill.table[1][ply]};
-    sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
+    sortMove(moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     // check checkmate / stalemate
     if (nMoves == 0)
@@ -572,7 +569,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
         INVALID_BITMOVE,
         INVALID_BITMOVE,
     };
-    sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
+    sortMove(moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     for (int i = 0; i < nMoves; i++)
     {

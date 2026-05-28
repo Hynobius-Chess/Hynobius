@@ -17,37 +17,57 @@ constexpr int MAX_SCORE = 1e9;
 
 struct SearchStats
 {
-    int64_t depth;
-    int score;
-    int64_t negamaxNodes;
-    int64_t qsNodes;
-    int64_t timeMs;
-    int64_t nps;
+    int64_t depth{};
+    int score{};
+    int64_t negamaxNodes{};
+    int64_t qsNodes{};
+    int64_t timeMs{};
+    int64_t nps{};
 
-    int64_t ttProbe;
-    int64_t ttHits;
-    int64_t ttCuts;
-    int64_t ttLower;
-    int64_t ttUpper;
-    int64_t ttExact;
+    int64_t ttProbe{};
+    int64_t ttHits{};
+    int64_t ttCuts{};
+    int64_t ttLower{};
+    int64_t ttUpper{};
+    int64_t ttExact{};
 
-    int64_t betaCuts;
-    int64_t betaCutsFirst;
+    int64_t betaCuts{};
+    int64_t betaCutsFirst{};
 
-    int64_t failHighs;
-    int64_t failHighsFirst;
+    int64_t failHighs{};
+    int64_t failHighsFirst{};
+
+    static SearchStats cleared()
+    {
+        return SearchStats{};
+    }
+
+    static SearchStats initialized()
+    {
+        SearchStats stats{};
+        stats.depth = -1;
+        stats.score = -MAX_SCORE;
+        stats.timeMs = -1;
+        stats.nps = -1;
+        return stats;
+    }
 
     void clear()
     {
-        *this = SearchStats{};
+        *this = SearchStats::cleared();
     }
 
-    int64_t totalNodes()
+    void resetForSeach()
+    {
+        *this = SearchStats::initialized();
+    }
+
+    int64_t totalNodes() const
     {
         return negamaxNodes + qsNodes;
     }
 
-    void print()
+    void print() const
     {
         std::cout << "depth=" << depth;
         std::cout << " negamaxnodes=" << negamaxNodes;
@@ -58,7 +78,7 @@ struct SearchStats
         std::cout << " betacuts=" << betaCuts;
         std::cout << " firstbetacuts=" << betaCutsFirst;
         std::cout << " firstbetacutrate=" << std::fixed << std::setprecision(4)
-                  << (betaCuts > 0 ? (double)betaCutsFirst * 100 / betaCuts : 0);
+                  << (betaCuts > 0 ? (double)betaCutsFirst * 100 / (double)betaCuts : 0);
         std::cout << " ttprobe=" << ttProbe;
         std::cout << " tthits=" << ttHits;
         std::cout << " ttcuts=" << ttCuts;
@@ -66,26 +86,46 @@ struct SearchStats
         std::cout << " ttUpper=" << ttUpper;
         std::cout << " ttExact=" << ttExact;
         std::cout << " ttcut_hit_rate=" << std::fixed << std::setprecision(4)
-                  << (ttHits > 0 ? (double)ttCuts * 100 / ttHits : 0);
+                  << (ttHits > 0 ? (double)ttCuts * 100 / (double)ttHits : 0);
         std::cout << " ttcut_negamaxnodes_rate=" << std::fixed << std::setprecision(4)
-                  << (negamaxNodes > 0 ? (double)ttCuts * 100 / negamaxNodes : 0);
+                  << (negamaxNodes > 0 ? (double)ttCuts * 100 / (double)negamaxNodes : 0);
         std::cout << '\n' << std::flush;
     }
 };
 
 struct SearchResult
 {
-    bool isValid = 0;
-    int bestScore;
-    BitMove bestBitMove = INVALID_BITMOVE;
+    bool isValid = {};
+    int bestScore = {};
+    BitMove bestBitMove = {};
 
-    SearchStats stats;
+    SearchStats stats = {};
 
-    PVTable pv;
+    PVTable pv = {};
+
+    static SearchResult cleared()
+    {
+        return SearchResult{};
+    }
+
+    static SearchResult invalid()
+    {
+        SearchResult result{};
+        result.isValid = false;
+        result.bestScore = -MAX_SCORE,
+        result.bestBitMove = INVALID_BITMOVE,
+        result.stats = SearchStats::cleared();
+        result.pv = {};
+        return result;
+    }
 
     void clear()
     {
-        *this = SearchResult{};
+        *this = SearchResult::cleared();
+    }
+    void resetForSearch()
+    {
+        *this = invalid();
     }
 };
 
@@ -134,8 +174,8 @@ private:
                             const int depth,
                             const int alpha,
                             const int beta,
-                            const int ply,
-                            const BitMove PVMove);
+                            const int ply
+                            );
 
     int negamax(Board& board, const int depth, const int alpha, const int beta, const int ply);
 
@@ -149,7 +189,7 @@ private:
 
     UndoState undoState[SearchVarialble::MAX_PLY + 5];
 
-    BitMove moveBuffer[SearchVarialble::MAX_PLY + 5][256] = {INVALID_BITMOVE};
+    BitMove moveBuffer[SearchVarialble::MAX_PLY + 5][256];
 
     bool shouldStop();
 

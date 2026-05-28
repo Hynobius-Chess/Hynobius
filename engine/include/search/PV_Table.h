@@ -6,7 +6,7 @@
 
 struct PVTable
 {
-    BitMove table[SearchVarialble::MAX_PLY][SearchVarialble::MAX_PLY];
+    BitMove table[SearchVarialble::MAX_PLY][SearchVarialble::MAX_PLY] = {};
     int length[SearchVarialble::MAX_PLY] = {}; // init to 0.
 
     inline void clearLine(int ply)

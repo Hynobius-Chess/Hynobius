@@ -10,7 +10,6 @@ int evaluateKnightMobility(const Board& board, Player player, int knightMobility
 
     for (int i = 0; i < knightCount; i++)
     {
-        Position knightPositions[32];
         generatePiecePosFromPos(board, posArray[i], knight, [&](const Position pos) { cnt++; });
     }
 
@@ -26,7 +25,6 @@ int evaluateBishopMobility(const Board& board, Player player, int bishopMobility
 
     for (int i = 0; i < bishopCount; i++)
     {
-        Position bishopPositions[32];
         generatePiecePosFromPos(board, posArray[i], bishop, [&](const Position pos) { cnt++; });
     }
 
@@ -42,7 +40,6 @@ int evaluateRookMobility(const Board& board, Player player, int rookMobilityWeig
 
     for (int i = 0; i < rookCount; i++)
     {
-        Position rookPositions[32];
         generatePiecePosFromPos(board, posArray[i], rook, [&](const Position pos) { cnt++; });
     }
 

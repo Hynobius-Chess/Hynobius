@@ -22,12 +22,12 @@ PerftStats perftWithStat(Board& board, int depth)
         if (depth == 1)
         {
             stat.nodes++;
-            stat.captures += (getCapture(move) == true ? 1 : 0);
-            stat.enPassants += (getEnPassant(move) == true ? 1 : 0);
-            stat.castles += (getCastle(move) == true ? 1 : 0);
-            stat.promotions += (getPromotion(move) == true ? 1 : 0);
+            stat.captures += (getCapture(move) == true ? 1u : 0u);
+            stat.enPassants += (getEnPassant(move) == true ? 1u : 0u);
+            stat.castles += (getCastle(move) == true ? 1u : 0u);
+            stat.promotions += (getPromotion(move) == true ? 1u : 0u);
             // player now is the enemy because we've functioned doBitMove.
-            stat.checks += (isInCheck(board, board.player) ? 1 : 0);
+            stat.checks += (isInCheck(board, board.player) ? 1u : 0u);
         }
         else
         {
@@ -47,7 +47,7 @@ uint64_t perft(Board& board, int depth)
     BitMove moves[256];
     int nMoves = generateAllLegalMoves(board, moves);
 
-    int node = 0;
+    uint64_t node = 0;
 
     if (depth == 0)
     {
@@ -55,7 +55,7 @@ uint64_t perft(Board& board, int depth)
     }
     if (depth == 1)
     {
-        return nMoves;
+        return static_cast<uint64_t>(nMoves);
     }
 
     for (int i = 0; i < nMoves; i++)

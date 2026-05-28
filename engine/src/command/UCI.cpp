@@ -189,7 +189,6 @@ void handleBench(std::istringstream& iss, Engine& engine)
 {
     std::string token;
 
-    bool isPerft = false; // TODO
     int depth = -1;
 
     while (iss >> token)
@@ -217,14 +216,13 @@ void handleBench(std::istringstream& iss, Engine& engine)
         "4r1k1/1pR2pp1/7p/1P2rP2/P4K1P/3R2P1/8/8 b - - 0 43",                   // endgame
     };
 
-    SearchStats totalStats;
     auto startTime = std::chrono::steady_clock::now();
     int64_t totalNodes = 0;
 
     for (int i = 0; i < (int)fen.size(); i++)
     {
         engine.newGame();
-        engine.setPositionWithFen(fen[i]);
+        engine.setPositionWithFen(fen[static_cast<size_t>(i)]);
         SearchResult result = engine.fullInfoSearch(depth);
         result.stats.print();
         totalNodes += result.stats.totalNodes();

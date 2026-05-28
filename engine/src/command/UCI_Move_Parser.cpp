@@ -1,6 +1,6 @@
 #include "command/UCI_Move_Parcer.h"
 
-Move parseCastle(Move& move, const Board& board)
+Move parseCastle(Move& move)
 {
     Piece p = move.movePiece;
 
@@ -73,7 +73,7 @@ Move parseUCIMove(const std::string strMove, const Board& board)
     move.movePiece = board.at(move.from);
     move.capturePiece = board.board[move.to.row][move.to.col];
 
-    move = parseCastle(move, board);
+    move = parseCastle(move);
     move = parseEnPassant(move, board);
 
     if (strMove.length() == 5)

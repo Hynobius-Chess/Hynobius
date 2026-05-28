@@ -1,5 +1,3 @@
-#pragma GCC optimize("O3,unroll-loops")
-
 #include "board/Attack.h"
 #include "board/Board.h"
 #include "move/Move_Direction.h"
@@ -200,7 +198,6 @@ int countStraightAttacks(const Board& board, Position pos, const Player player)
 
 bool isStraightAttacking(const Board& board, Position pos, const Player player)
 {
-    int cnt = 0;
     const Piece rook = makePiece(player, 'R');
     const Piece queen = makePiece(player, 'Q');
 

@@ -40,7 +40,8 @@ inline Square positionToSquare(const Position pos)
 
 inline bool isValidSquare(const Square square)
 {
-    return ((0 <= square && square < 64) ? true : false);
+    // 0 <= square is always true due to Square = uint8_t.
+    return (square < 64 ? true : false);
 }
 
 // Check whether a position is inside board. (8 x 8)

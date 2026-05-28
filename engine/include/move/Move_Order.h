@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Type.h"
-#include "board/Board.h"
 #include <algorithm>
 
 struct ScoreMove
@@ -16,7 +15,7 @@ struct advanceMoves
 };
 
 template <typename scoreMoveFunction>
-void sortMove(const Board& board, BitMove* moves, const int nMoves, scoreMoveFunction&& scoreMove)
+void sortMove(BitMove* moves, const int nMoves, scoreMoveFunction&& scoreMove)
 {
     ScoreMove tmp[256];
 

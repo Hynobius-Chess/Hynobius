@@ -19,7 +19,7 @@ public:
     void checkReady() const;
     void newGame();
 
-    BitMove goDepth(int depth, bool isPrintInfo = 1);
+    BitMove goDepth(int depth);
     BitMove goClock(const TimeManage& tm);
     BitMove goTime(const int64_t time);
     SearchResult fullInfoSearch(int depth);

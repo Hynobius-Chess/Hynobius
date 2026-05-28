@@ -95,13 +95,13 @@ inline BitMove makeBitMove(const Square from,
 
     BitMove res = 0;
 
-    res |= from;
-    res |= (to << 6);
-    res |= (pieceToIndex(promotePiece) << 12);
-    res |= (static_cast<int>(isCapture) << 16);
-    res |= (static_cast<int>(isCastle) << 17);
-    res |= (static_cast<int>(isEnPassant) << 18);
-    res |= (static_cast<int>(isPromotion) << 19);
+    res |= static_cast<BitMove>(from);
+    res |= (static_cast<BitMove>(to) << 6);
+    res |= (static_cast<BitMove>(pieceToIndex(promotePiece)) << 12);
+    res |= (static_cast<BitMove>(isCapture) << 16);
+    res |= (static_cast<BitMove>(isCastle) << 17);
+    res |= (static_cast<BitMove>(isEnPassant) << 18);
+    res |= (static_cast<BitMove>(isPromotion) << 19);
 
     return res;
 }
@@ -191,7 +191,9 @@ inline std::string bitMoveToUCIMove(const BitMove& move)
 
     if (getPromotion(move))
     {
-        res += std::tolower(pieceToChar(getPromotePiece(move)));
+        res += static_cast<char>(
+            std::tolower(static_cast<unsigned char>(pieceToChar(getPromotePiece(move))))
+        );
     }
 
     return res;
