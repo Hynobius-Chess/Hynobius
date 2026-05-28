@@ -1,0 +1,86 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "gcc-release-o2",
+      "displayName": "GCC Release O2",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gcc-release-o2",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O2 -DNDEBUG"
+      }
+    },
+    {
+      "name": "gcc-release-o3",
+      "displayName": "GCC Release O3",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gcc-release-o3",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
+      }
+    },
+    {
+      "name": "gcc-release-o3-native",
+      "displayName": "GCC Release O3 Native",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gcc-release-o3-native",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -DNDEBUG"
+      }
+    },
+    {
+      "name": "gcc-release-o3-native-lto",
+      "displayName": "GCC Release O3 Native LTO",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gcc-release-o3-native-lto",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -flto -DNDEBUG",
+        "CMAKE_EXE_LINKER_FLAGS_RELEASE": "-flto"
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "GCC Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gcc-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "msvc-release-o2",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/msvc-release-o2",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /DNDEBUG"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc-release-o2",
+      "configurePreset": "gcc-release-o2"
+    },
+    {
+      "name": "gcc-release-o3",
+      "configurePreset": "gcc-release-o3"
+    },
+    {
+      "name": "gcc-release-o3-native",
+      "configurePreset": "gcc-release-o3-native"
+    },
+    {
+      "name": "gcc-release-o3-native-lto",
+      "configurePreset": "gcc-release-o3-native-lto"
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc-debug"
+    }
+  ]
+}
