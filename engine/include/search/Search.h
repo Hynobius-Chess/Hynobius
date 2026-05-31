@@ -116,6 +116,7 @@ struct SearchContext
         startTime = std::chrono::steady_clock::now();
         pv = PVTable{};
         prevPv = PVTable{};
+        prevScore = 0;
         stats.clear();
     }
 };
