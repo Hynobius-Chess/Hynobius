@@ -9,6 +9,8 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "move/Move_Order.h"
+#include "search/History_Heuristic.h"
+#include "search/Killer_Move.h"
 #include "search/Search_Variables.h"
 #include "search/TT.h"
 #include <chrono>
@@ -146,6 +148,10 @@ SearchResult Search::findBestMove(const Board& board)
     // init state.
     state.reset();
 
+    // clear killer and history move to recover from v0.3.0-beta.2
+    kill = killerMove{};
+    history = HistoryHeuristic{};
+
     // make copyBoard non-const.
     Board copyBoard = board;
 
@@ -200,7 +206,6 @@ SearchResult Search::findBestMove(const Board& board)
         SearchResult currentResult;
         currentResult.clear();
         currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
-        ;
 
         if (depth == 1)
         {
