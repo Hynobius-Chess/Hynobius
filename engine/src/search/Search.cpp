@@ -9,6 +9,8 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "move/Move_Order.h"
+#include "search/History_Heuristic.h"
+#include "search/Killer_Move.h"
 #include "search/Search_Variables.h"
 #include "search/TT.h"
 #include <chrono>
@@ -58,7 +60,7 @@ int Search::scoreMove(const Board& board, const BitMove move, const advanceMoves
         score += KILLER_2_SCORE;
 
     // history heuristic
-    score += state.history.getHistory(board.player, move);
+    score += history.getHistory(board.player, move);
 
     return score;
 }
@@ -146,6 +148,10 @@ SearchResult Search::findBestMove(const Board& board)
     // init state.
     state.reset();
 
+    // clear killer and history move to recover from v0.3.0-beta.2
+    kill = killerMove{};
+    history = HistoryHeuristic{};
+
     // make copyBoard non-const.
     Board copyBoard = board;
 
@@ -200,7 +206,6 @@ SearchResult Search::findBestMove(const Board& board)
         SearchResult currentResult;
         currentResult.clear();
         currentResult = {false, -MAX_SCORE, INVALID_BITMOVE};
-        ;
 
         if (depth == 1)
         {
@@ -294,8 +299,7 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         pvMove = state.prevPv.table[ply][0];
 
     // sort moves
-    advanceMoves adv = {
-        pvMove, INVALID_BITMOVE, state.kill.table[0][ply], state.kill.table[1][ply]};
+    advanceMoves adv = {pvMove, INVALID_BITMOVE, kill.table[0][ply], kill.table[1][ply]};
     sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     for (int i = 0; i < nMoves; i++)
@@ -410,7 +414,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
         pvMove = state.prevPv.table[ply][0];
 
     // Sort moves.
-    advanceMoves adv = {pvMove, ttMove, state.kill.table[0][ply], state.kill.table[1][ply]};
+    advanceMoves adv = {pvMove, ttMove, kill.table[0][ply], kill.table[1][ply]};
     sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     // check checkmate / stalemate
@@ -491,8 +495,8 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
         {
             if (!undoState[ply].isCapture)
             {
-                state.kill.addKillerMove(move, ply);
-                state.history.updateHisroty(undoState[ply].player, move, depth);
+                kill.addKillerMove(move, ply);
+                history.updateHisroty(undoState[ply].player, move, depth);
             }
 
             if (i == 0)
