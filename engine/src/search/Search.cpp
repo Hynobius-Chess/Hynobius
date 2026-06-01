@@ -299,8 +299,7 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         pvMove = state.prevPv.table[ply][0];
 
     // sort moves
-    advanceMoves adv = {
-        pvMove, INVALID_BITMOVE, kill.table[0][ply], kill.table[1][ply]};
+    advanceMoves adv = {pvMove, INVALID_BITMOVE, kill.table[0][ply], kill.table[1][ply]};
     sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
     for (int i = 0; i < nMoves; i++)
