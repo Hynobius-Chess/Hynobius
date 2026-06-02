@@ -9,6 +9,7 @@
 #include "move/Make_BitMove.h"
 #include "move/Move.h"
 #include "move/Move_Order.h"
+#include "search/PV_Table.h"
 #include <chrono>
 
 constexpr int MATE_SCORE = 30000;
@@ -104,10 +105,6 @@ struct SearchContext
 
     PVTable pv, prevPv;
 
-    killerMove kill;
-
-    HistoryHeuristic history;
-
     int prevScore = 0;
 
     SearchStats stats;
@@ -117,6 +114,9 @@ struct SearchContext
         stopped = false;
         timeout = false;
         startTime = std::chrono::steady_clock::now();
+        pv = PVTable{};
+        prevPv = PVTable{};
+        prevScore = 0;
         stats.clear();
     }
 };
@@ -144,6 +144,9 @@ private:
     void printInfo();
 
     SearchLimits limits;
+
+    killerMove kill;
+    HistoryHeuristic history;
 
     SearchContext state;
 
