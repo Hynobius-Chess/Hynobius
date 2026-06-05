@@ -45,7 +45,7 @@ Board cinFenToBoard(const std::string& fen)
     }
     if (!(row == 7 && col == 8)) throw FenParseError("bad board layout");
 
-    if (!(player == "w" || player == "w")) throw FenParseError("bad player");
+    if (!(player == "w" || player == "b")) throw FenParseError("bad player");
 
     board.player = (player == "w" ? Player::WHITE : Player::BLACK);
 
