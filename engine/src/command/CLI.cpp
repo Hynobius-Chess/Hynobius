@@ -1,6 +1,7 @@
 #include "command/CLI.h"
 #include "Engine.h"
 #include "board/Board.h"
+#include "command/UCI.h"
 #include "debug/perft.h"
 #include "fen/FEN_Parser.h"
 #include "move/Move.h"
@@ -78,14 +79,14 @@ int runCommand(const Config& cfg)
     {
         case RunMode::PERFT:
         {
-            Board board = cinFenToBoard(cfg.fen);
+            Board board = tryCinFenToBoard(cfg.fen);
             std::cout << "nodes=" << perft(board, cfg.depth) << END;
 
             return 0;
         }
         case RunMode::PERFT_STATS:
         {
-            Board board = cinFenToBoard(cfg.fen);
+            Board board = tryCinFenToBoard(cfg.fen);
             PerftStats stats = perftWithStat(board, cfg.depth);
 
             std::cout << "nodes=" << stats.nodes << END;
