@@ -292,7 +292,7 @@ void uciLoop(Engine& engine)
             }
             else
             {
-                std::cerr << "Unrecognized token.\n" << std::flush;
+                throw UciCommandError("unrecognized token \'" + token + "\'");
             }
         }
         catch (const EngineError& e)
