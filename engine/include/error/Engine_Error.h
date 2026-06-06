@@ -16,3 +16,12 @@ public:
     explicit FenParseError(const std::string& reason)
         : EngineError("invalid FEN: " + reason) {}
 };
+
+class UciCommandError : public EngineError
+{
+public:
+    UciCommandError()
+        : EngineError("invalid UCI command") {}
+    explicit UciCommandError(const std::string& reason)
+        : EngineError("invalid UCI command: " + reason) {}
+};

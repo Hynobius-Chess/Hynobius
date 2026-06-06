@@ -165,7 +165,7 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
     else
     {
-        ENGINE_FATAL("uci", "Invalid UCI position command.");
+        throw UciCommandError("position command should start with \'fen\' or \'startpos\'");
     }
 
     // no moves command
@@ -203,8 +203,7 @@ void handleBench(std::istringstream& iss, Engine& engine)
 
     if (depth <= 0)
     {
-        std::cout << "info string error: bench requires a depth\n" << std::flush;
-        return;
+        throw UciCommandError("bench command should contain a positive \'depth\' argument");
     }
 
     std::vector<std::string> fen = {
