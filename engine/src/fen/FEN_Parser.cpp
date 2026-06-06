@@ -3,6 +3,7 @@
 #include "evaluate/Material_Point.h"
 #include "evaluate/PST.h"
 #include "search/Zobrist.h"
+#include "error/Engine_Error.h"
 #include <iostream>
 #include <sstream>
 
@@ -95,17 +96,4 @@ Board cinFenToBoard(const std::string& fen)
     board.pushRepetitionKey();
 
     return board;
-}
-
-Board tryCinFenToBoard(const std::string &fen)
-{
-    try
-    {
-        return cinFenToBoard(fen);
-    }
-    catch (const FenParseError& e)
-    {
-        std::cout << "info string error: " << e.what() << '\n';
-        return Board{};
-    }
 }

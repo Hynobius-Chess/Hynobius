@@ -26,7 +26,7 @@ void Engine::setStartPosition()
 
 void Engine::setPositionWithFen(const std::string& fen)
 {
-    board = tryCinFenToBoard(fen);
+    board = cinFenToBoard(fen);
 }
 
 void Engine::checkReady() const {}

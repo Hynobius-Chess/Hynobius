@@ -3,6 +3,7 @@
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
 #include "debug/perft.h"
+#include "error/Engine_Error.h"
 #include "move/Move.h"
 #include "pgn/Pgn_Transformer.h"
 #include "search/Search.h"
@@ -246,46 +247,53 @@ void uciLoop(Engine& engine)
     std::string line;
     while (std::getline(std::cin, line))
     {
-        std::istringstream iss(line);
-        std::string token;
-        iss >> token;
+        try
+        {
+            std::istringstream iss(line);
+            std::string token;
+            iss >> token;
 
-        if (token == "uci")
-        {
-            std::cout << "id name Hynobius 0.3beta\nid author EmmetThor\n";
-            std::cout << "uciok\n" << std::flush;
+            if (token == "uci")
+            {
+                std::cout << "id name Hynobius 0.3\nid author EmmetThor\n";
+                std::cout << "uciok\n" << std::flush;
+            }
+            else if (token == "isready")
+            {
+                std::cout << "readyok\n" << std::flush;
+            }
+            else if (token == "position")
+            {
+                handlePosition(iss, engine);
+            }
+            else if (token == "go")
+            {
+                handleGo(iss, engine);
+            }
+            else if (token == "bench")
+            {
+                handleBench(iss, engine);
+            }
+            else if (token == "quit" || token == "stop")
+            {
+                break;
+            }
+            else if (token == "d")
+            {
+                std::cout << engine.board << '\n';
+            }
+            else if (token == "ucinewgame")
+            {
+                engine.newGame();
+            }
+            else
+            {
+                std::cerr << "Unrecognized token.\n" << std::flush;
+            }
         }
-        else if (token == "isready")
+        catch (const EngineError& e)
         {
-            std::cout << "readyok\n" << std::flush;
-        }
-        else if (token == "position")
-        {
-            handlePosition(iss, engine);
-        }
-        else if (token == "go")
-        {
-            handleGo(iss, engine);
-        }
-        else if (token == "bench")
-        {
-            handleBench(iss, engine);
-        }
-        else if (token == "quit" || token == "stop")
-        {
-            break;
-        }
-        else if (token == "d")
-        {
-            std::cout << engine.board << '\n';
-        }
-        else if (token == "ucinewgame")
-        {
-            engine.newGame();
-        }
-        else
-        {
-            std::cerr << "Unrecognized token.\n" << std::flush;
+            std::cout << "info string error: " << e.what() << std::endl;
         }
     }
 }

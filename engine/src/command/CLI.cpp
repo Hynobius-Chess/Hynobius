@@ -79,14 +79,14 @@ int runCommand(const Config& cfg)
     {
         case RunMode::PERFT:
         {
-            Board board = tryCinFenToBoard(cfg.fen);
+            Board board = cinFenToBoard(cfg.fen);
             std::cout << "nodes=" << perft(board, cfg.depth) << END;
 
             return 0;
         }
         case RunMode::PERFT_STATS:
         {
-            Board board = tryCinFenToBoard(cfg.fen);
+            Board board = cinFenToBoard(cfg.fen);
             PerftStats stats = perftWithStat(board, cfg.depth);
 
             std::cout << "nodes=" << stats.nodes << END;

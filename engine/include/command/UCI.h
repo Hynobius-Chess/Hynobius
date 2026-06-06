@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Engine.h"
-#include "fen/FEN_Parser.h"
 
 void uciLoop(Engine& engine);
 
@@ -15,3 +14,4 @@ struct UCIGoLimit
     bool isMoveTime = false;
     int64_t movetime = 0;
 };
+
