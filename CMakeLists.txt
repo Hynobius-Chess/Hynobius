@@ -49,6 +49,7 @@
 
         engine/src/Engine.cpp
         engine/src/Time_Management.cpp
+        engine/src/Version.cpp
     )
 
     add_executable(Hynobius engine/src/main.cpp)

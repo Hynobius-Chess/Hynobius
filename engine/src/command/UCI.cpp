@@ -1,6 +1,7 @@
 #include "command/UCI.h"
 #include "Structure_IO.h"
 #include "Time_Management.h"
+#include "Version.h"
 #include "command/UCI_Move_Parcer.h"
 #include "debug/perft.h"
 #include "error/Engine_Error.h"
@@ -259,7 +260,8 @@ void uciLoop(Engine& engine)
 
             if (token == "uci")
             {
-                std::cout << "id name Hynobius 0.3\nid author EmmetThor\n";
+                std::cout << "id name " << Hynobius::engineFullName() << '\n';
+                std::cout << "id author " << Hynobius::engineAuthor() << '\n';
                 std::cout << "uciok\n" << std::flush;
             }
             else if (token == "isready")
