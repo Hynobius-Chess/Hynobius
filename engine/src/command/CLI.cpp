@@ -1,6 +1,7 @@
 #include "command/CLI.h"
 #include "Engine.h"
 #include "board/Board.h"
+#include "command/UCI.h"
 #include "debug/perft.h"
 #include "fen/FEN_Parser.h"
 #include "move/Move.h"

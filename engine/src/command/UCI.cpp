@@ -3,6 +3,7 @@
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
 #include "debug/perft.h"
+#include "error/Engine_Error.h"
 #include "move/Move.h"
 #include "pgn/Pgn_Transformer.h"
 #include "search/Search.h"
@@ -100,8 +101,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
     {
         if (tm.depth <= 0)
         {
-            std::cout << "info string error: perft requires a depth\n" << std::flush;
-            return;
+            throw UciCommandError("perft command should contain a positive \'depth\' argument");
         }
 
         PerftStats stats = perftWithStat(engine.board, tm.depth);
@@ -146,6 +146,7 @@ void handlePosition(std::istringstream& iss, Engine& engine)
 {
     std::string token, fen;
     iss >> token;
+    bool hasMove = false;
 
     if (token == "startpos")
     {
@@ -153,9 +154,14 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
     else if (token == "fen")
     {
-        for (int t = 0; t < 6; t++)
+        while (iss >> token)
         {
-            iss >> token;
+            if (token == "moves")
+            {
+                hasMove = true;
+                break;
+            }
+
             if (!fen.empty())
                 fen += " ";
             fen += token;
@@ -164,16 +170,16 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
     else
     {
-        ENGINE_FATAL("uci", "Invalid UCI position command.");
+        throw UciCommandError("position command should start with \'fen\' or \'startpos\'");
     }
 
     // no moves command
-    if (!(iss >> token))
+    if (!hasMove && !(iss >> token))
     {
         return;
     }
 
-    if (token == "moves")
+    if (hasMove || token == "moves")
     {
         std::string strMove;
         while (iss >> strMove)
@@ -202,8 +208,7 @@ void handleBench(std::istringstream& iss, Engine& engine)
 
     if (depth <= 0)
     {
-        std::cout << "info string error: bench requires a depth\n" << std::flush;
-        return;
+        throw UciCommandError("bench command should contain a positive \'depth\' argument");
     }
 
     std::vector<std::string> fen = {
@@ -246,46 +251,53 @@ void uciLoop(Engine& engine)
     std::string line;
     while (std::getline(std::cin, line))
     {
-        std::istringstream iss(line);
-        std::string token;
-        iss >> token;
+        try
+        {
+            std::istringstream iss(line);
+            std::string token;
+            iss >> token;
 
-        if (token == "uci")
-        {
-            std::cout << "id name Hynobius 0.3beta\nid author EmmetThor\n";
-            std::cout << "uciok\n" << std::flush;
+            if (token == "uci")
+            {
+                std::cout << "id name Hynobius 0.3\nid author EmmetThor\n";
+                std::cout << "uciok\n" << std::flush;
+            }
+            else if (token == "isready")
+            {
+                std::cout << "readyok\n" << std::flush;
+            }
+            else if (token == "position")
+            {
+                handlePosition(iss, engine);
+            }
+            else if (token == "go")
+            {
+                handleGo(iss, engine);
+            }
+            else if (token == "bench")
+            {
+                handleBench(iss, engine);
+            }
+            else if (token == "quit" || token == "stop")
+            {
+                break;
+            }
+            else if (token == "d")
+            {
+                std::cout << engine.board << '\n';
+            }
+            else if (token == "ucinewgame")
+            {
+                engine.newGame();
+            }
+            else
+            {
+                throw UciCommandError("unrecognized token \'" + token + "\'");
+            }
         }
-        else if (token == "isready")
+        catch (const EngineError& e)
         {
-            std::cout << "readyok\n" << std::flush;
-        }
-        else if (token == "position")
-        {
-            handlePosition(iss, engine);
-        }
-        else if (token == "go")
-        {
-            handleGo(iss, engine);
-        }
-        else if (token == "bench")
-        {
-            handleBench(iss, engine);
-        }
-        else if (token == "quit" || token == "stop")
-        {
-            break;
-        }
-        else if (token == "d")
-        {
-            std::cout << engine.board << '\n';
-        }
-        else if (token == "ucinewgame")
-        {
-            engine.newGame();
-        }
-        else
-        {
-            std::cerr << "Unrecognized token.\n" << std::flush;
+            std::cout << "info string error: " << e.what() << std::endl;
         }
     }
 }

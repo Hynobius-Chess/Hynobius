@@ -1,4 +1,7 @@
+#include "board/Board.h"
+#include "board/Piece.h"
 #include "command/UCI_Move_Parcer.h"
+#include "error/Engine_Error.h"
 
 Move parseCastle(Move& move, const Board& board)
 {
@@ -67,10 +70,30 @@ Move parseEnPassant(Move& move, const Board& board)
 Move parseUCIMove(const std::string strMove, const Board& board)
 {
     Move move;
+
     move.from = {8 - (strMove[1] - '0'), strMove[0] - 'a'};
+    if (!isInBoard(move.from))
+    {
+        throw UciMoveParserError(std::string("\'") + strMove[0] + strMove[1] +
+                                 "\' is out of board");
+    }
+
     move.to = {8 - (strMove[3] - '0'), strMove[2] - 'a'};
+    if (!isInBoard(move.to))
+    {
+        throw UciMoveParserError(std::string("\'") + strMove[2] + strMove[3] +
+                                 "\' is out of board");
+    }
+
     move.player = board.player;
+
     move.movePiece = board.at(move.from);
+    if (!isValidPieceIndex(pieceToIndex(move.movePiece)))
+    {
+        throw UciMoveParserError(std::string("\'") + strMove.substr(0, 4) +
+                                 "\' is not moving a piece");
+    }
+
     move.capturePiece = board.board[move.to.row][move.to.col];
 
     move = parseCastle(move, board);
@@ -97,6 +120,9 @@ Move parseUCIMove(const std::string strMove, const Board& board)
             case 'n':
                 move.promotionPiece = makePiece(player, 'N');
                 break;
+            default:
+                throw UciMoveParserError(std::string("\'") + strMove[4] +
+                                         "\' is not a valid promotion piece");
         }
     }
 
