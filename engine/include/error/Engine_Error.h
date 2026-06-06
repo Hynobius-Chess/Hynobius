@@ -25,3 +25,12 @@ public:
     explicit UciCommandError(const std::string& reason)
         : EngineError("invalid UCI command: " + reason) {}
 };
+
+class UciMoveParserError : public EngineError
+{
+public:
+    UciMoveParserError()
+        : EngineError("invalid UCI move") {}
+    explicit UciMoveParserError(const std::string& reason)
+        : EngineError("invalid UCI move: " + reason) {}
+};
