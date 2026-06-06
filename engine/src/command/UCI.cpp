@@ -101,8 +101,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
     {
         if (tm.depth <= 0)
         {
-            std::cout << "info string error: perft requires a depth\n" << std::flush;
-            return;
+            throw UciCommandError("perft command should contain a positive \'depth\' argument");
         }
 
         PerftStats stats = perftWithStat(engine.board, tm.depth);
