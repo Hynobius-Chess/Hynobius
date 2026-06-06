@@ -1,9 +1,9 @@
 #include "fen/FEN_Parser.h"
 #include "board/Board.h"
+#include "error/Engine_Error.h"
 #include "evaluate/Material_Point.h"
 #include "evaluate/PST.h"
 #include "search/Zobrist.h"
-#include "error/Engine_Error.h"
 #include <iostream>
 #include <sstream>
 
@@ -15,7 +15,8 @@ Board cinFenToBoard(const std::string& fen)
     std::string boardStr, player, castling, enpass, halfmove, fullmove;
     if (!(iss >> boardStr >> player >> castling >> enpass >> halfmove >> fullmove))
     {
-        throw FenParseError("FEN in incomplete. It should contain: board, player, castling rights, en passant square, half move counter, full move counter");
+        throw FenParseError("FEN in incomplete. It should contain: board, player, castling rights, "
+                            "en passant square, half move counter, full move counter");
     }
 
     int row = 0, col = 0;
@@ -23,7 +24,8 @@ Board cinFenToBoard(const std::string& fen)
     {
         if (c == '/')
         {
-            if (col != 8) throw FenParseError("bad board layout");
+            if (col != 8)
+                throw FenParseError("bad board layout");
             row++;
             col = 0;
         }
@@ -32,7 +34,8 @@ Board cinFenToBoard(const std::string& fen)
         {
             for (int i = 0; i < c - '0'; i++)
             {
-                if (!isInBoard({row, col + i})) throw FenParseError("bad board layout");
+                if (!isInBoard({row, col + i}))
+                    throw FenParseError("bad board layout");
                 board.board[row][col + i] = Piece::EMPTY;
             }
             col += c - '0';
@@ -40,13 +43,16 @@ Board cinFenToBoard(const std::string& fen)
 
         else
         {
-            if (!isInBoard({row, col})) throw FenParseError("bad board layout");
+            if (!isInBoard({row, col}))
+                throw FenParseError("bad board layout");
             board.board[row][col++] = makePiece((isupper(c) ? Player::WHITE : Player::BLACK), c);
         }
     }
-    if (!(row == 7 && col == 8)) throw FenParseError("bad board layout");
+    if (!(row == 7 && col == 8))
+        throw FenParseError("bad board layout");
 
-    if (!(player == "w" || player == "b")) throw FenParseError("bad player");
+    if (!(player == "w" || player == "b"))
+        throw FenParseError("bad player");
 
     board.player = (player == "w" ? Player::WHITE : Player::BLACK);
 
@@ -79,7 +85,8 @@ Board cinFenToBoard(const std::string& fen)
     {
         board.enPassantPos = {8 - (enpass[1] - '0'), (enpass[0] - 'a')};
 
-        if (!isInBoard(board.enPassantPos)) throw FenParseError("bad en passant square");
+        if (!isInBoard(board.enPassantPos))
+            throw FenParseError("bad en passant square");
     }
     else
     {

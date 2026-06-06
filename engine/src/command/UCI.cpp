@@ -1,5 +1,4 @@
 #include "command/UCI.h"
-#include "error/Engine_Error.h"
 #include "Structure_IO.h"
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
@@ -155,7 +154,8 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
     else if (token == "fen")
     {
-        while (iss >> token) {
+        while (iss >> token)
+        {
             if (token == "moves")
             {
                 hasMove = true;

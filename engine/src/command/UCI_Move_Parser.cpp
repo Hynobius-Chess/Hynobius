@@ -74,13 +74,15 @@ Move parseUCIMove(const std::string strMove, const Board& board)
     move.from = {8 - (strMove[1] - '0'), strMove[0] - 'a'};
     if (!isInBoard(move.from))
     {
-        throw UciMoveParserError(std::string("\'") + strMove[0] + strMove[1] + "\' is out of board");
+        throw UciMoveParserError(std::string("\'") + strMove[0] + strMove[1] +
+                                 "\' is out of board");
     }
 
     move.to = {8 - (strMove[3] - '0'), strMove[2] - 'a'};
     if (!isInBoard(move.to))
     {
-        throw UciMoveParserError(std::string("\'") + strMove[2] + strMove[3] + "\' is out of board");
+        throw UciMoveParserError(std::string("\'") + strMove[2] + strMove[3] +
+                                 "\' is out of board");
     }
 
     move.player = board.player;
@@ -88,7 +90,8 @@ Move parseUCIMove(const std::string strMove, const Board& board)
     move.movePiece = board.at(move.from);
     if (!isValidPieceIndex(pieceToIndex(move.movePiece)))
     {
-        throw UciMoveParserError(std::string("\'") + strMove.substr(0, 4) + "\' is not moving a piece");
+        throw UciMoveParserError(std::string("\'") + strMove.substr(0, 4) +
+                                 "\' is not moving a piece");
     }
 
     move.capturePiece = board.board[move.to.row][move.to.col];
@@ -118,7 +121,8 @@ Move parseUCIMove(const std::string strMove, const Board& board)
                 move.promotionPiece = makePiece(player, 'N');
                 break;
             default:
-                throw UciMoveParserError(std::string("\'") + strMove[4] + "\' is not a valid promotion piece");
+                throw UciMoveParserError(std::string("\'") + strMove[4] +
+                                         "\' is not a valid promotion piece");
         }
     }
 
