@@ -4,9 +4,6 @@
 #include "move/Generate_Move.h"
 #include "move/Make_BitMove.h"
 
-#include "Structure_IO.h"
-#include <iostream>
-
 PerftStats perftWithStat(Board& board, int depth)
 {
     BitMove moves[256];

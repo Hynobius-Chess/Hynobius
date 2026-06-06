@@ -8,7 +8,7 @@
 struct killerMove
 {
     BitMove table[2][SearchVarialble::MAX_PLY] = {INVALID_BITMOVE};
-    inline void addKillerMove(const BitMove& move, int ply)
+    inline void addKillerMove(const BitMove move, const int ply)
     {
         ENGINE_ASSERT(ply < SearchVarialble::MAX_PLY);
 

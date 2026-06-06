@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Engine.h"
 #include <string>
-
-void cliLoop(Engine& engine);
 
 enum class RunMode
 {

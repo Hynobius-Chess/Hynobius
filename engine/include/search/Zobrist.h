@@ -13,4 +13,4 @@ extern uint64_t zobEnPassant[8];
 
 void initZobrist();
 uint64_t computeZobrist(const Board& board);
-int zobBoardPosition(Position pos);
+int zobBoardPosition(const Position pos);

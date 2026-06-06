@@ -13,4 +13,4 @@ struct TimeManage
     int depth = -1;
 };
 
-SearchLimits timeManager(const TimeManage& tm, Player player);
+SearchLimits timeManager(const TimeManage& tm, const Player player);

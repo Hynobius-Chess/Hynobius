@@ -1,0 +1,109 @@
+name: Auto Pre-release
+
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+
+
+permissions:
+  contents: write
+
+jobs:
+  auto-prerelease:
+    name: Auto pre-release from commit message
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect information
+        id: detect
+        shell: pwsh
+        run: |
+          $tagName = '${{ inputs.tag_name }}'
+          $shortSha = git rev-parse --short=8 HEAD
+          $fullSha = git rev-parse HEAD
+
+          Write-Host "Detected pre-release tag: $tagName"
+
+          "TAG_NAME=$tagName" >> $env:GITHUB_ENV
+          "SHORT_SHA=$shortSha" >> $env:GITHUB_ENV
+          "FULL_SHA=$fullSha" >> $env:GITHUB_ENV
+
+      - name: Write release-notes.md
+        shell: pwsh
+        run: |
+          $commitMessage = (git log -1 --pretty=%B) -join "`n"
+
+          $notes = @(
+            "$commitMessage"
+          ) -join "`n"
+
+          $notes | Set-Content -Path release-notes.md -Encoding utf8
+
+          Write-Host "release-notes.md created."
+          Get-Content release-notes.md
+
+      - name: Check tag does not already exist
+        shell: pwsh
+        run: |
+          git fetch --tags
+
+          $exists = git tag --list "$env:TAG_NAME"
+
+          if ($exists) {
+            Write-Error "Tag $env:TAG_NAME already exists. Use a new pre-release version."
+            exit 1
+          }
+
+      - name: Create annotated tag
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$env:TAG_NAME" -F release-notes.md
+          git push origin "refs/tags/$env:TAG_NAME"
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Prepare artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist
+
+          $exe = Get-ChildItem -Path build -Recurse -Filter "Hynobius.exe" | Select-Object -First 1
+
+          if ($null -eq $exe) {
+            Write-Error "Hynobius.exe not found."
+            exit 1
+          }
+
+          Copy-Item $exe.FullName "dist/Hynobius-$env:TAG_NAME-windows.exe"
+
+      - name: Create GitHub pre-release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$env:TAG_NAME" `
+            "dist/Hynobius-$env:TAG_NAME-windows.exe" `
+            --title "Hynobius $env:TAG_NAME dev-$env:SHORT_SHA" `
+            --notes-file release-notes.md `
+            --prerelease

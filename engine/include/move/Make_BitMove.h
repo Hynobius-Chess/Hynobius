@@ -4,6 +4,7 @@
 #include <board/Piece.h>
 #include <cstdint>
 
+// Get the piece the move captured.
 inline Piece getCapturePiece(const Board& board, const BitMove move)
 {
     if (!getCapture(move))

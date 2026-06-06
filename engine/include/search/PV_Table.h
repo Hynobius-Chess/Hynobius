@@ -15,7 +15,7 @@ struct PVTable
         length[ply] = 0;
     }
 
-    inline void update(int ply, const BitMove move)
+    inline void update(const int ply, const BitMove move)
     {
         table[ply][0] = move;
 

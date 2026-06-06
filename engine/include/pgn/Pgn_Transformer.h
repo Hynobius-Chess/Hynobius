@@ -7,6 +7,6 @@
 extern const char colToPgn[8];
 extern const char rowToPgn[8];
 
-Position pgnToPosition(std::string s);
+Position pgnToPosition(const std::string& s);
 
-std::string positionToPgn(Position pos);
+std::string positionToPgn(const Position pos);

@@ -14,8 +14,8 @@ enum Castle
 };
 
 /*
-bit  0  1  2 | 3  4  5 | Position from
-bit  6  7  8 | 9 10 11 | Position to
+bit  0  1  2 | 3  4  5 | Square from
+bit  6  7  8 | 9 10 11 | Square to
 bit 12 13 14 15          Promote Piece
 bit 16                   is capture
 bit 17                   is castle
@@ -38,10 +38,7 @@ inline Square getFromSquare(const BitMove move)
 {
     Square res = static_cast<Square>(move & FROM_MASK);
 
-    if (!isValidSquare(res))
-    {
-        ENGINE_FATAL("bit move", "invalid from square: ", res);
-    }
+    ENGINE_ASSERT(isValidSquare(res));
 
     return res;
 }
@@ -50,10 +47,7 @@ inline Square getToSquare(const BitMove move)
 {
     Square res = static_cast<Square>((move & TO_MASK) >> 6);
 
-    if (!isValidSquare(res))
-    {
-        ENGINE_FATAL("bit move", "invalid to square: ", res);
-    }
+    ENGINE_ASSERT(isValidSquare(res));
 
     return res;
 }
@@ -62,10 +56,7 @@ inline Piece getPromotePiece(const BitMove move)
 {
     int pieceIndex = static_cast<int>((move & PROMOTE_PIECE_MASK) >> 12);
 
-    if (pieceIndex != 0 && !isValidPieceIndex(pieceIndex))
-    {
-        ENGINE_FATAL("bit move", "invalid piece index: ", pieceIndex);
-    }
+    ENGINE_ASSERT(pieceIndex == 0 || isValidPieceIndex(pieceIndex));
 
     return static_cast<Piece>(pieceIndex);
 }
@@ -98,19 +89,9 @@ inline BitMove makeBitMove(const Square from,
                            const bool isEnPassant,
                            const bool isPromotion)
 {
-    if (!isValidSquare(from))
-    {
-        ENGINE_FATAL("bit move", "invalid from square:", from);
-    }
-
-    if (!isValidSquare(to))
-    {
-        ENGINE_FATAL("bit move", "invalid to square:", to);
-    }
-    if (promotePiece != Piece::EMPTY && !isValidPieceIndex(pieceToIndex(promotePiece)))
-    {
-        ENGINE_FATAL("bit move", "invalid promotion piece:", pieceToIndex(promotePiece));
-    }
+    ENGINE_ASSERT(isValidSquare(from));
+    ENGINE_ASSERT(isValidSquare(to));
+    ENGINE_ASSERT(promotePiece == Piece::EMPTY || isValidPieceIndex(pieceToIndex(promotePiece)));
 
     BitMove res = 0;
 
@@ -165,8 +146,6 @@ struct CastleMove
 };
 
 void printMove(const Move& move);
-
-void moveDebugPrint(const Move& move);
 
 bool isMoveLegal(const Board& board, const Move& move);
 

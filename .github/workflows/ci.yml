@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: Detect requests
+    runs-on: ubuntu-latest
+
+    outputs:
+      should_test: ${{ steps.detect.outputs.should_test }}
+      should_pre_release: ${{ steps.detect.outputs.should_pre_release }}
+      pre_release_tag: ${{ steps.detect.outputs.pre_release_tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect requests
+        id: detect
+        shell: pwsh
+        run: |
+          $commitMessage = git log -1 --pretty=%B
+
+          Write-Host "========== Commit message start =========="
+          Write-Host $commitMessage
+          Write-Host "========== Commit message end =========="
+
+          $should_test_match = [regex]::Match(
+            $commitMessage,
+            '(?i)\bfunctional\s+changes?\b'
+          )
+
+          if ($should_test_match.Success) {
+            Write-Host "Functional Change field found. Running tests."
+            "should_test=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No Functional Change field found. Skipping tests."
+            "should_test=false" >> $env:GITHUB_OUTPUT
+          }
+
+          $pre_release_match = [regex]::Match(
+            $commitMessage,
+            '(?i)\bPre[- ]Release\s*[:：]\s*(v\d+\.\d+\.\d+-(alpha|beta|rc)\.\d+)\b'
+          )
+
+          if ($pre_release_match.Success) {
+            $tag = $pre_release_match.Groups[1].Value
+            Write-Host "Pre-Release field found: $tag"
+            "should_pre_release=true" >> $env:GITHUB_OUTPUT
+            "pre_release_tag=$tag" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No Pre-Release field found. Skipping pre-release."
+            "should_pre_release=false" >> $env:GITHUB_OUTPUT
+            "pre_release_tag=" >> $env:GITHUB_OUTPUT
+          }
+
+  # directly give testing repo workflows repo name.
+  test:
+    name: Run Tests
+    needs: check
+    if: needs.check.outputs.should_test == 'true'
+    uses: Hynobius-Chess/Hynobius-testing/.github/workflows/run_tests.yml@main
+    with:
+      engine_ref: ${{ github.sha }}
+
+  format:
+    needs: check
+    uses: ./.github/workflows/format-check.yml
+
+  pre-release:
+    name: Pre Release
+    needs: check
+    if: github.event_name == 'push' && needs.check.outputs.should_pre_release == 'true'
+    uses: ./.github/workflows/pre-release.yml
+    with:
+      tag_name: ${{ needs.check.outputs.pre_release_tag }}
