@@ -6,7 +6,7 @@
 namespace Hynobius
 {
 constexpr std::string_view ENGINE_NAME = "Hynobius";
-constexpr std::string_view ENGINE_VERSION = "dev";
+constexpr std::string_view ENGINE_VERSION = "0.3";
 constexpr std::string_view ENGINE_AUTHOR = "Emmetthor";
 
 std::string engineName()
