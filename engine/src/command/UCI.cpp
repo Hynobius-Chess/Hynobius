@@ -1,4 +1,5 @@
 #include "command/UCI.h"
+#include "error/Engine_Error.h"
 #include "Structure_IO.h"
 #include "Time_Management.h"
 #include "command/UCI_Move_Parcer.h"
@@ -146,6 +147,7 @@ void handlePosition(std::istringstream& iss, Engine& engine)
 {
     std::string token, fen;
     iss >> token;
+    bool hasMove = false;
 
     if (token == "startpos")
     {
@@ -153,9 +155,13 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
     else if (token == "fen")
     {
-        for (int t = 0; t < 6; t++)
-        {
-            iss >> token;
+        while (iss >> token) {
+            if (token == "moves")
+            {
+                hasMove = true;
+                break;
+            }
+
             if (!fen.empty())
                 fen += " ";
             fen += token;
@@ -168,12 +174,12 @@ void handlePosition(std::istringstream& iss, Engine& engine)
     }
 
     // no moves command
-    if (!(iss >> token))
+    if (!hasMove && !(iss >> token))
     {
         return;
     }
 
-    if (token == "moves")
+    if (hasMove || token == "moves")
     {
         std::string strMove;
         while (iss >> strMove)
