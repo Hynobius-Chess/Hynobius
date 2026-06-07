@@ -7,7 +7,7 @@
 #include "search/Search_Variables.h"
 #include <cstdint>
 
-// Store direct position like `board[pos.row][pos.col]`.
+// Store direct position like `board[pos.row][pos.col]`
 struct Position
 {
     int row = -1;
@@ -23,106 +23,91 @@ struct Position
     }
 };
 
-// invalid position.
+// invalid position
 constexpr Position POS_NONE = {-1, -1};
+
+// Check whether a position is inside board (8 x 8)
+inline bool isInBoard(const Position pos)
+{
+    return 0 <= pos.row && pos.row < 8 && 0 <= pos.col && pos.col < 8;
+}
+// Check whether a position is inside board (8 x 8)
+inline bool isInBoard(const int row, const int col)
+{
+    return 0 <= row && row < 8 && 0 <= col && col < 8;
+}
+
+// Check whether a square is inside board (8 x 8)
+inline bool isValidSquare(const Square square)
+{
+    return ((0 <= square && square < 64) ? true : false);
+}
 
 // WARN temporary transfrom fuction
 inline Position squareToPosition(const Square square)
 {
+    ENGINE_ASSERT(isValidSquare(square));
     return {square / 8, square & 7};
 }
 
 // WARN temporary transfrom fuction
 inline Square positionToSquare(const Position pos)
 {
+    ENGINE_ASSERT(isInBoard(pos));
     return static_cast<Square>(pos.row * 8 + pos.col);
 }
 
-inline bool isValidSquare(const Square square)
-{
-    return ((0 <= square && square < 64) ? true : false);
-}
-
-// Check whether a position is inside board. (8 x 8)
-inline bool isInBoard(const Position pos)
-{
-    return 0 <= pos.row && pos.row < 8 && 0 <= pos.col && pos.col < 8;
-}
-inline bool isInBoard(const int row, const int col)
-{
-    return 0 <= row && row < 8 && 0 <= col && col < 8;
-}
-
-// Check whether a player is `Player::WHITE` or `Player::BLACK`.
-// WARN useless
-inline bool isPlayerValid(const Player player)
-{
-    return player == Player::WHITE || player == Player::BLACK;
-}
-
-// Returns the opposide player.
+// Returns the opponent of the current player
 inline Player opponent(const Player player)
 {
     return (player == Player::WHITE ? Player::BLACK : Player::WHITE);
 }
 
-/*
-Make `Piece` using `Player` and `char`.
-Note that LOWERCASE chars are not accepted.
-*/
+
+// Make `Piece` using `Player` and `char`
+// Note that LOWERCASE chars are not accepted
 inline Piece makePiece(const Player player, const char pieceChar)
 {
     return MAKE_PIECE_MAP[static_cast<int>(player)][charToPieceIndex(pieceChar)];
 }
 
-/*
-Returns `static_cast<int>(player)`
-*/
+
+// Returns `static_cast<int>(player)`
 inline int playerToIndex(const Player player)
 {
     return static_cast<int>(player);
 }
 
-/*
-The main body of board.
-
-Responsibilities:
-- store must-have info like `Piece` and `Player`.
-- store info to speed up modules.
-
-Invariants:
-- `piecePos` must be correct.
-- info to speed up modules must be correct.
-*/
+// The main body of board
+// Responsibilities:
+// - store must-have info like `Piece` and `Player`
+// - store info to speed up modules
+// Invariants:
+// - `piecePos` must be correct
+// - info to speed up modules must be correct
 struct Board
 {
     Board();
 
-    /*
-    Initialize `board` with `startpos`.
+    // Initialize `board` with `startpos`
+    // Invariants:
+    // - every info stored in `board` must be initialized
+    // - using other FEN or PGN to initialize board is NOT contained here
+    // WARN TODO init() should be compatible with FEN and PGN
+    void initWithStartpos();
 
-    Invariants:
-    - every info stored in `board` must be initialized.
-    - using other FEN or PGN to initialize board is NOT contained here.
-
-    WARN TODO init() should be compatible with FEN and PGN
-    */
-    void init();
-
-    /*
-    Returns the Piece at `pos`.
-
-    Obsoleting.
-    */
+    // Returns the Piece at `pos`.
+    // Obsoleting.
     inline Piece at(Position pos) const
     {
         ENGINE_ASSERT(isInBoard(pos));
         return board[pos.row][pos.col];
     }
 
-    // Set the `pos` in the board to piece `p`.
+    // Set the `pos` in the board to piece `p`
     inline void set(Position pos, Piece p)
     {
+        ENGINE_ASSERT(isInBoard(pos));
         board[pos.row][pos.col] = p;
     }
 
@@ -133,13 +118,11 @@ struct Board
     int PSTScore;
     Player player;
 
-    /*
-    Store castling rights using bits.
-    - 0001 black king  side
-    - 0010 black queen side
-    - 0100 white king  side
-    - 1000 white queen side
-    */
+    // Store castling rights using bits
+    // - 0001 black king  side
+    // - 0010 black queen side
+    // - 0100 white king  side
+    // - 1000 white queen side
     int castleRights;
 
     uint64_t zobristKey;
@@ -149,17 +132,20 @@ struct Board
     uint64_t keyHistory[SearchVarialble::MAX_GAME_PLY];
     int repetitionHistoryLength = 0;
 
+    // Set repetition key lenght to 0
     inline void clearRepetitionKey()
     {
         repetitionHistoryLength = 0;
     }
 
+    // Push current zobrist key into `keyHistory`
     inline void pushRepetitionKey()
     {
         ENGINE_ASSERT(repetitionHistoryLength < SearchVarialble::MAX_GAME_PLY);
         keyHistory[repetitionHistoryLength++] = zobristKey;
     }
 
+    // Decrease repetition key length by 1
     inline void popRepetitionKey()
     {
         ENGINE_ASSERT(repetitionHistoryLength != 0);
@@ -175,6 +161,8 @@ struct Board
     // Delete the piece in `target` in `piecePos[Piece]`.
     inline void piecePosDelete(Position* posArray, int& count, const Position target)
     {
+        ENGINE_ASSERT(isInBoard(target));
+
         for (int i = 0; i < count; i++)
         {
             if (posArray[i] == target)
@@ -191,6 +179,7 @@ struct Board
     // Add the Piece in `add` in `piecePos[Piece]`.
     inline void piecePosAdd(Position* posArray, int& count, const Position add)
     {
+        ENGINE_ASSERT(isInBoard(add));
         posArray[count++] = add;
     }
 
@@ -198,22 +187,20 @@ struct Board
     // an array.
     inline const Position* getPiecePos(const Piece p) const
     {
+        ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p)));
         return piecePos[pieceToIndex(p)];
     }
 
-    // Returns the number of piece `p`.
+    // Returns the number of piece `p`
     inline int getPieceCount(const Piece p) const
     {
-        if (!isValidPieceIndex(pieceToIndex(p)))
-        {
-            ENGINE_FATAL(
-                "board",
-                "Non-piece Piece::Object can't get piece count because it is not on the board.");
-        }
+        ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p)));
 
         return pieceCount[pieceToIndex(p)];
     }
 
+    // Check whether the current position is repetition
+    // WARN can speed it up by adding 50 move count
     inline bool isRepetition()
     {
         int count = 0;
@@ -235,7 +222,6 @@ struct Board
 };
 
 // Check whether every piece positions is correct.
-// WARN useless
 bool validatePiecePos(const Board& b);
 
 // Generate every piece positions by the current board.

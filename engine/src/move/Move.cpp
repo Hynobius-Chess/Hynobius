@@ -359,8 +359,7 @@ bool isKingMoveLegal(const Board& board, const Move& move)
 bool isCastleLegal(const Board& board, const Move& move)
 {
     Player player = move.player;
-    ENGINE_ASSERT(isPlayerValid(player));
-
+    
     if (player == Player::WHITE)
     {
         if (move.castle == SHORT_CASTLE)
