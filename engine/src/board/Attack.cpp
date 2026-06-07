@@ -1,3 +1,4 @@
+#include "debug/log.h"
 #pragma GCC optimize("O3,unroll-loops")
 
 #include "board/Attack.h"
@@ -6,6 +7,8 @@
 
 int countPawnAttacks(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     const int pawnRow = pos.row + (player == Player::WHITE ? 1 : -1);
     const Piece pawn = makePiece(player, 'P');
 
@@ -23,6 +26,8 @@ int countPawnAttacks(const Board& board, Position pos, const Player player)
 
 bool isPawnAttacking(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     const int pawnRow = pos.row + (player == Player::WHITE ? 1 : -1);
     const Piece pawn = makePiece(player, 'P');
 
@@ -39,6 +44,8 @@ bool isPawnAttacking(const Board& board, Position pos, const Player player)
 
 int countKingAttacks(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     int cnt = 0;
     const Piece king = makePiece(player, 'K');
 
@@ -56,6 +63,8 @@ int countKingAttacks(const Board& board, Position pos, const Player player)
 
 bool isKingAttacking(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     const Piece king = makePiece(player, 'K');
 
     for (int i = 0; i < 8; i++)
@@ -72,6 +81,8 @@ bool isKingAttacking(const Board& board, Position pos, const Player player)
 
 int countKnightAttacks(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     int cnt = 0;
     const Piece knight = makePiece(player, 'N');
 
@@ -89,6 +100,8 @@ int countKnightAttacks(const Board& board, Position pos, const Player player)
 
 bool isKnightAttacking(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     const Piece knight = makePiece(player, 'N');
 
     for (int i = 0; i < 8; i++)
@@ -105,6 +118,8 @@ bool isKnightAttacking(const Board& board, Position pos, const Player player)
 
 int countDiagonalAttacks(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     int cnt = 0;
     const Piece bishop = makePiece(player, 'B');
     const Piece queen = makePiece(player, 'Q');
@@ -121,11 +136,11 @@ int countDiagonalAttacks(const Board& board, Position pos, const Player player)
 
             const Piece pp = board.board[row][col];
 
-            if (pp == bishop || pp == queen)
-                cnt++;
-
             if (pp != Piece::EMPTY)
+            {
+                if (pp == bishop || pp == queen) cnt++;
                 break;
+            }
 
             row += MoveDirection::BISHOP_QUEEN_DR[i];
             col += MoveDirection::BISHOP_QUEEN_DC[i];
@@ -137,6 +152,8 @@ int countDiagonalAttacks(const Board& board, Position pos, const Player player)
 
 bool isDiagonalAttacking(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     const Piece bishop = makePiece(player, 'B');
     const Piece queen = makePiece(player, 'Q');
 
@@ -152,11 +169,12 @@ bool isDiagonalAttacking(const Board& board, Position pos, const Player player)
 
             const Piece pp = board.board[row][col];
 
-            if (pp == bishop || pp == queen)
-                return true;
-
             if (pp != Piece::EMPTY)
+            {
+                if (pp == bishop || pp == queen) return true;
                 break;
+            }
+
 
             row += MoveDirection::BISHOP_QUEEN_DR[i];
             col += MoveDirection::BISHOP_QUEEN_DC[i];
@@ -168,6 +186,8 @@ bool isDiagonalAttacking(const Board& board, Position pos, const Player player)
 
 int countStraightAttacks(const Board& board, Position pos, const Player player)
 {
+    ENGINE_ASSERT(isInBoard(pos));
+
     int cnt = 0;
     const Piece rook = makePiece(player, 'R');
     const Piece queen = makePiece(player, 'Q');
@@ -184,11 +204,11 @@ int countStraightAttacks(const Board& board, Position pos, const Player player)
 
             const Piece pp = board.board[row][col];
 
-            if (pp == rook || pp == queen)
-                cnt++;
-
             if (pp != Piece::EMPTY)
+            {
+                if (pp == rook || pp == queen) cnt++;
                 break;
+            }
 
             row += MoveDirection::ROOK_QUEEN_DR[i];
             col += MoveDirection::ROOK_QUEEN_DC[i];
@@ -200,7 +220,8 @@ int countStraightAttacks(const Board& board, Position pos, const Player player)
 
 bool isStraightAttacking(const Board& board, Position pos, const Player player)
 {
-    int cnt = 0;
+    ENGINE_ASSERT(isInBoard(pos));
+
     const Piece rook = makePiece(player, 'R');
     const Piece queen = makePiece(player, 'Q');
 
@@ -216,11 +237,11 @@ bool isStraightAttacking(const Board& board, Position pos, const Player player)
 
             const Piece pp = board.board[row][col];
 
-            if (pp == rook || pp == queen)
-                return true;
-
             if (pp != Piece::EMPTY)
+            {
+                if (pp == rook || pp == queen) return true;
                 break;
+            }
 
             row += MoveDirection::ROOK_QUEEN_DR[i];
             col += MoveDirection::ROOK_QUEEN_DC[i];
@@ -233,7 +254,6 @@ bool isStraightAttacking(const Board& board, Position pos, const Player player)
 // Calculate attacks in the designated square.
 int countSquareAttacks(const Board& board, Position pos, const Player player)
 {
-    // check position.
     ENGINE_ASSERT(isInBoard(pos));
 
     int cnt = 0;
@@ -248,7 +268,6 @@ int countSquareAttacks(const Board& board, Position pos, const Player player)
 // Check whether the designated square is attacked.
 bool isSquareAttacked(const Board& board, Position pos, const Player player)
 {
-    // check position
     ENGINE_ASSERT(isInBoard(pos));
 
     if (isPawnAttacking(board, pos, player))
