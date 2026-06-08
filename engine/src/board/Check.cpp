@@ -11,8 +11,5 @@ bool isInCheck(const Board& board, const Player player)
 
     ENGINE_ASSERT(kingCount == 1);
 
-    if (isSquareAttacked(board, posArray[0], opponent(player)))
-        return true;
-    else
-        return false;
+    return isSquareAttacked(board, posArray[0], opponent(player));
 }
