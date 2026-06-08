@@ -10,7 +10,6 @@
     # add_definitions(-DENGINE_DEBUG)
 
     add_library(engine-core
-        engine/src/board/Piece.cpp
         engine/src/board/Board.cpp
         engine/src/board/Attack.cpp
         engine/src/board/Check.cpp
