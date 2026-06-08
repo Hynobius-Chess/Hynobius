@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="docs/img/icon-128.png">
+    <img src="icon-128.png">
     <br>
     <h3>Hynobius</h3>
     A chess engine with tutorials, documents, scientific testing and web analysis interface.
