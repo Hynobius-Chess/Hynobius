@@ -55,3 +55,11 @@
     add_executable(Hynobius engine/src/main.cpp)
     target_link_libraries(Hynobius PUBLIC engine-core)
     set_target_properties(Hynobius PROPERTIES WIN32_EXECUTABLE OFF)
+
+    if (MINGW)
+    target_link_options(Hynobius PRIVATE
+        -static
+        -static-libgcc
+        -static-libstdc++
+    )
+    endif()
