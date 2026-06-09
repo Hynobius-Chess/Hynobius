@@ -16,7 +16,7 @@
 
 std::string castleMap[2][3]{{"invalid", "e1g1", "e1c1"}, {"invalid", "e8g8", "e8c8"}};
 
-std::string UCIMoveToString(const Move& move)
+std::string moveToUCIMove(const Move& move)
 {
     std::string res;
     if (move.castle == SHORT_CASTLE || move.castle == LONG_CASTLE)
@@ -140,7 +140,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
         return;
     }
 
-    std::cout << "bestmove " << UCIMoveToString(bitMovetoOriMove(engine.board, move)) << '\n';
+    std::cout << "bestmove " << moveToUCIMove(bitMovetoOriMove(engine.board, move)) << '\n';
 }
 
 void handlePosition(std::istringstream& iss, Engine& engine)
