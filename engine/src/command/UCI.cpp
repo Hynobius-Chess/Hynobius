@@ -128,9 +128,8 @@ void handleGo(std::istringstream& iss, Engine& engine)
     {
         move = engine.goDepth(tm.depth);
     }
-    else // WARN movetime is not implemented yet.
+    else
     {
-        DOUT("UCI") << "start clock search\n";
         move = engine.goClock(tm);
     }
 
