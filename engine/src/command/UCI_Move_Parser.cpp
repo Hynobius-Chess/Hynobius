@@ -2,6 +2,7 @@
 #include "board/Piece.h"
 #include "command/UCI_Move_Parcer.h"
 #include "error/Engine_Error.h"
+#include <string>
 
 Move parseCastle(Move& move, const Board& board)
 {
@@ -69,6 +70,11 @@ Move parseEnPassant(Move& move, const Board& board)
 
 Move parseUCIMove(const std::string strMove, const Board& board)
 {
+    if (strMove.size() != 4 && strMove.size() != 5)
+    {
+        throw UciMoveParserError(std::string("\'") + strMove + "\' is too short or too long. A valid move should be e2e4 or e7e8q" );
+    }
+
     Move move;
 
     move.from = {8 - (strMove[1] - '0'), strMove[0] - 'a'};
