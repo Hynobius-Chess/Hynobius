@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-Board cinFenToBoard(const std::string& fen)
+Board fenToBoard(const std::string& fen)
 {
     Board board;
 

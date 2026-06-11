@@ -3,4 +3,5 @@
 #include "board/Board.h"
 #include <string>
 
-Board cinFenToBoard(const std::string& fen);
+// Turn FEN into `Board`
+Board fenToBoard(const std::string& fen);
