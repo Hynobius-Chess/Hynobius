@@ -2,6 +2,7 @@
 
 #include "Type.h"
 #include "board/Board.h"
+#include "move/Generate_Variables.h"
 #include <algorithm>
 
 struct ScoreMove
@@ -18,7 +19,8 @@ struct advanceMoves
 template <typename scoreMoveFunction>
 void sortMove(const Board& board, BitMove* moves, const int nMoves, scoreMoveFunction&& scoreMove)
 {
-    ScoreMove tmp[256];
+    // WARN this array should not be put here because it will reallocate in every node
+    ScoreMove tmp[GenearteVarialble::MAX_PSEUDOLEGAL_MOVES];
 
     for (int i = 0; i < nMoves; i++)
     {

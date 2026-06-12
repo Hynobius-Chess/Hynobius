@@ -1,16 +1,10 @@
 #include "command/CLI.h"
 #include "Engine.h"
 #include "board/Board.h"
-#include "command/UCI.h"
 #include "debug/perft.h"
 #include "fen/FEN_Parser.h"
 #include "move/Move.h"
 
-#define RESET "\033[0m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
-#define YELLOW "\033[33m"
-#define BLUE "\033[34m"
 #define END '\n' << std::flush
 
 #include <stdexcept>
@@ -79,14 +73,14 @@ int runCommand(const Config& cfg)
     {
         case RunMode::PERFT:
         {
-            Board board = cinFenToBoard(cfg.fen);
+            Board board = fenToBoard(cfg.fen);
             std::cout << "nodes=" << perft(board, cfg.depth) << END;
 
             return 0;
         }
         case RunMode::PERFT_STATS:
         {
-            Board board = cinFenToBoard(cfg.fen);
+            Board board = fenToBoard(cfg.fen);
             PerftStats stats = perftWithStat(board, cfg.depth);
 
             std::cout << "nodes=" << stats.nodes << END;
@@ -100,7 +94,7 @@ int runCommand(const Config& cfg)
         }
         case RunMode::PERFT_DIVIDE:
         {
-            std::cout << "test perft divide" << END;
+            std::cout << "preft divide commands is not implemented yet. Please try other commands." << END;
             return 0;
         }
         case RunMode::SEARCH_WITH_INFO:

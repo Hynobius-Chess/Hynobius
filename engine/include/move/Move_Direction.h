@@ -1,6 +1,6 @@
 #pragma once
 
-// constexpr of piece move directions.
+// Constexpr of piece move directions
 namespace MoveDirection
 {
 constexpr int KNIGHT_DR[] = {1, 2, 2, 1, -1, -2, -2, -1};

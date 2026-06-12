@@ -123,11 +123,10 @@ template <typename Emit> int generatePawnQuietMoves(const Board& board, Emit&& e
         const Position pushOneStep = {r + dr, c};
         const Position pushTwoStep = {r + 2 * dr, c};
         const Square fromSquare = positionToSquare(fromPos);
-        const Square pushOneStepSquare = positionToSquare(pushOneStep);
-        const Square pushTwoStepSquare = positionToSquare(pushTwoStep);
 
         if (isInBoard(pushOneStep) && board.at(pushOneStep) == Piece::EMPTY)
         {
+            const Square pushOneStepSquare = positionToSquare(pushOneStep);
             if (pushOneStep.row == promoteRank)
             {
                 const Piece knight = makePiece(player, 'N');
@@ -155,6 +154,7 @@ template <typename Emit> int generatePawnQuietMoves(const Board& board, Emit&& e
         if (r == startRank && board.at(pushOneStep) == Piece::EMPTY &&
             board.at(pushTwoStep) == Piece::EMPTY)
         {
+            const Square pushTwoStepSquare = positionToSquare(pushTwoStep);
             const BitMove move = makeBitMove(
                 fromSquare, pushTwoStepSquare, Piece::EMPTY, false, false, false, false);
 
@@ -472,8 +472,6 @@ int filterLegalMoves(const Board& board, BitMove* allMoves, int nAllMoves, BitMo
 
 int generateAllLegalMoves(Board& board, BitMove* buffer)
 {
-    ENGINE_ASSERT(isPlayerValid(board.player));
-
     int cnt = 0;
     generatePseudoLegalMoves(board,
                              buffer,
@@ -490,8 +488,6 @@ int generateAllLegalMoves(Board& board, BitMove* buffer)
 
 int generateLegalCaptureMoves(Board& board, BitMove* buffer)
 {
-    ENGINE_ASSERT(isPlayerValid(board.player));
-
     int cnt = 0;
     generatePseudoLegalCaptures(board,
                                 buffer,

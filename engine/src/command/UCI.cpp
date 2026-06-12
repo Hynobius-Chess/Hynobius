@@ -16,7 +16,7 @@
 
 std::string castleMap[2][3]{{"invalid", "e1g1", "e1c1"}, {"invalid", "e8g8", "e8c8"}};
 
-std::string UCIMoveToString(const Move& move)
+std::string moveToUCIMove(const Move& move)
 {
     std::string res;
     if (move.castle == SHORT_CASTLE || move.castle == LONG_CASTLE)
@@ -128,19 +128,12 @@ void handleGo(std::istringstream& iss, Engine& engine)
     {
         move = engine.goDepth(tm.depth);
     }
-    else // WARN movetime is not implemented yet.
+    else
     {
-        DOUT("UCI") << "start clock search\n";
         move = engine.goClock(tm);
     }
 
-    if (move == INVALID_BITMOVE)
-    {
-        std::cout << "bestmove 0000\n";
-        return;
-    }
-
-    std::cout << "bestmove " << UCIMoveToString(bitMovetoOriMove(engine.board, move)) << '\n';
+    std::cout << "bestmove " << bitMoveToUCIMove(move) << '\n';
 }
 
 void handlePosition(std::istringstream& iss, Engine& engine)
