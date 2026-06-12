@@ -177,7 +177,7 @@ inline std::string bitMoveToUCIMove(const BitMove& move)
 {
     if (move == INVALID_BITMOVE)
     {
-        return "INVALID_BITMOVE";
+        return "0000";
     }
 
     Position from = squareToPosition(getFromSquare(move));

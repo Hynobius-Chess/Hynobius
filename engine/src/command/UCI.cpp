@@ -133,13 +133,7 @@ void handleGo(std::istringstream& iss, Engine& engine)
         move = engine.goClock(tm);
     }
 
-    if (move == INVALID_BITMOVE)
-    {
-        std::cout << "bestmove 0000\n";
-        return;
-    }
-
-    std::cout << "bestmove " << moveToUCIMove(bitMovetoOriMove(engine.board, move)) << '\n';
+    std::cout << "bestmove " << bitMoveToUCIMove(move) << '\n';
 }
 
 void handlePosition(std::istringstream& iss, Engine& engine)
