@@ -17,7 +17,6 @@
         engine/src/debug/Perft.cpp
 
         engine/src/move/Move.cpp
-        engine/src/move/Move_Order.cpp
         engine/src/move/Generate_Move.cpp
         engine/src/move/Make_BitMove.cpp
 
