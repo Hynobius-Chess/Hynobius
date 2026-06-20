@@ -14,6 +14,7 @@
 // WARN must be sure that doBitMove and undoBitMove won't break board states.
 bool isPseudoLegalMoveLegal(Board& board, const BitMove move)
 {
+    // Warn this variable should not be created in every function call
     UndoState undo;
 
     doBitMove(board, move, undo);
@@ -272,7 +273,7 @@ template <typename Emit> int generateEnPassants(const Board& board, Emit&& emit)
 
 template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
 {
-    // fast check.
+    // fast check
     if (board.castleRights == 0)
         return 0;
 
@@ -284,16 +285,16 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     const Position kingPos = {row, 4};
     const Square kingSquare = positionToSquare(kingPos);
 
-    // safety: king must be on e-file.
+    // safety: king must be on e-file
     if (board.at(kingPos) != makePiece(player, 'K'))
     {
         return 0;
     }
 
-    // king side.
+    // king side
     if (player == Player::WHITE)
     {
-        // white king side.
+        // white king side
         if (board.castleRights & 0b0100)
         {
             const Position f = {row, 5};
@@ -316,7 +317,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     }
     else
     {
-        // black king side.
+        // black king side
         if (board.castleRights & 0b0001)
         {
             const Position f = {row, 5};
@@ -342,7 +343,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     // queen side
     if (player == Player::WHITE)
     {
-        // white queen side.
+        // white queen side
         if (board.castleRights & 0b1000)
         {
             const Position a = {row, 0};
@@ -367,7 +368,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     }
     else
     {
-        // black queen side.
+        // black queen side
         if (board.castleRights & 0b0010)
         {
             const Position a = {row, 0};
@@ -398,7 +399,6 @@ int generatePseudoLegalMoves(const Board& board, BitMove* buffer, Emit&& emit)
 {
     const Player player = board.player;
 
-    // checks.
     checkBoardState(board);
 
     int cnt = 0;
