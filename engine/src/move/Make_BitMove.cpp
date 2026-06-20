@@ -13,7 +13,7 @@ void doRegularMove(Board& board, const MoveState& state)
     board.set(state.to, state.placedPiece);
 }
 
-// update castle rights.
+// update castle rights
 // castle bit stores:
 // - bit0 black king side
 // - bit1 black queen side
@@ -25,22 +25,22 @@ int updateCastleRights(const int castleRights, const MoveState& state)
     const Player player = state.player;
     const int fromCol = state.from.col;
 
-    // move king -> remove every castle rights.
+    // move king -> remove every castle rights
     if (state.movePiece == makePiece(player, 'K'))
     {
         if (player == Player::WHITE)
         {
-            // remove bit2 and bit3 -> white king and queen side.
+            // remove bit2 and bit3 -> white king and queen side
             newCastleRights &= ~0b1100;
         }
         else
         {
-            // remove bit0 and bit1 -> white king and queen side.
+            // remove bit0 and bit1 -> white king and queen side
             newCastleRights &= ~0b0011;
         }
     }
 
-    // move rook -> remove the side the rook moved from.
+    // move rook -> remove the side the rook moved from
     else if (state.movePiece == makePiece(player, 'R'))
     {
         if (player == Player::WHITE)
@@ -102,7 +102,7 @@ Position updateEnPassantPos(const MoveState& state)
 
 void doCastling(Board& board, const MoveState& state)
 {
-    // move king.
+    // move king
     if (board.at(state.from) != makePiece(board.player, 'K'))
     {
         ENGINE_FATAL("bit move", "invalid castling: not moving a king");
@@ -202,7 +202,7 @@ void updateMaterialScoreDo(Board& board, const MoveState& state, const int weigh
 {
     if (state.isCastle)
     {
-        // castling should not change material score.
+        // castling should not change material score
         return;
     }
 
@@ -331,6 +331,7 @@ void updateZobristDo(Board& board, const MoveState& state, int oldCastleRights, 
 void doBitMove(Board& board, const BitMove move, UndoState& undo)
 {
     // make current move state.
+    // WARN this object should not be created every function call
     MoveState state(board, move);
 
     // save info for UndoState
@@ -350,18 +351,18 @@ void doBitMove(Board& board, const BitMove move, UndoState& undo)
         doRegularMove(board, state);
     }
 
-    // update castle rights.
+    // update castle rights
     const int oldCastleRights = state.castleRights;
     const int newCastelRights = updateCastleRights(oldCastleRights, state);
     board.castleRights = newCastelRights;
 
-    // update en passant position.
+    // update en passant position
     board.enPassantPos = updateEnPassantPos(state);
 
     // calculate weight
     int weight = (state.player == Player::WHITE ? 1 : -1);
 
-    // update material score.
+    // update material score
     updateMaterialScoreDo(board, state, weight);
 
     // update PST score.
