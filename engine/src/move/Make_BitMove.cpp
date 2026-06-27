@@ -365,16 +365,16 @@ void doBitMove(Board& board, const BitMove move, UndoState& undo)
     // update material score
     updateMaterialScoreDo(board, state, weight);
 
-    // update PST score.
+    // update PST score
     updatePSTScoreDo(board, state, weight);
 
-    // update piece pos.
+    // update piece pos
     computePiecePos(board);
 
-    // change player.
+    // change player
     board.player = opponent(board.player);
 
-    // update Zobrist.
+    // update Zobrist
     updateZobristDo(board, state, oldCastleRights, newCastelRights);
 
     checkBoardState(board);
