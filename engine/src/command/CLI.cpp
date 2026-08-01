@@ -94,7 +94,8 @@ int runCommand(const Config& cfg)
         }
         case RunMode::PERFT_DIVIDE:
         {
-            std::cout << "preft divide commands is not implemented yet. Please try other commands." << END;
+            std::cout << "preft divide commands is not implemented yet. Please try other commands."
+                      << END;
             return 0;
         }
         case RunMode::SEARCH_WITH_INFO:

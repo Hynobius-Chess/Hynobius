@@ -138,7 +138,8 @@ int countDiagonalAttacks(const Board& board, Position pos, const Player player)
 
             if (pp != Piece::EMPTY)
             {
-                if (pp == bishop || pp == queen) cnt++;
+                if (pp == bishop || pp == queen)
+                    cnt++;
                 break;
             }
 
@@ -171,10 +172,10 @@ bool isDiagonalAttacking(const Board& board, Position pos, const Player player)
 
             if (pp != Piece::EMPTY)
             {
-                if (pp == bishop || pp == queen) return true;
+                if (pp == bishop || pp == queen)
+                    return true;
                 break;
             }
-
 
             row += MoveDirection::BISHOP_QUEEN_DR[i];
             col += MoveDirection::BISHOP_QUEEN_DC[i];
@@ -206,7 +207,8 @@ int countStraightAttacks(const Board& board, Position pos, const Player player)
 
             if (pp != Piece::EMPTY)
             {
-                if (pp == rook || pp == queen) cnt++;
+                if (pp == rook || pp == queen)
+                    cnt++;
                 break;
             }
 
@@ -239,7 +241,8 @@ bool isStraightAttacking(const Board& board, Position pos, const Player player)
 
             if (pp != Piece::EMPTY)
             {
-                if (pp == rook || pp == queen) return true;
+                if (pp == rook || pp == queen)
+                    return true;
                 break;
             }
 

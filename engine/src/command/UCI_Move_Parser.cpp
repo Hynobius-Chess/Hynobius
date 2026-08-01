@@ -72,7 +72,9 @@ Move parseUCIMove(const std::string strMove, const Board& board)
 {
     if (strMove.size() != 4 && strMove.size() != 5)
     {
-        throw UciMoveParserError(std::string("\'") + strMove + "\' is too short or too long. A valid move should be e2e4 or e7e8q" );
+        throw UciMoveParserError(
+            std::string("\'") + strMove +
+            "\' is too short or too long. A valid move should be e2e4 or e7e8q");
     }
 
     Move move;

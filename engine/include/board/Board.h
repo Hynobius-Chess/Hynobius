@@ -63,14 +63,12 @@ inline Player opponent(const Player player)
     return (player == Player::WHITE ? Player::BLACK : Player::WHITE);
 }
 
-
 // Make `Piece` using `Player` and `char`
 // Note that LOWERCASE chars are not accepted
 inline Piece makePiece(const Player player, const char pieceChar)
 {
     return MAKE_PIECE_MAP[static_cast<int>(player)][charToPieceIndex(pieceChar)];
 }
-
 
 // Returns `static_cast<int>(player)`
 inline int playerToIndex(const Player player)
