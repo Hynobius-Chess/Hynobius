@@ -14,6 +14,7 @@
 // WARN must be sure that doBitMove and undoBitMove won't break board states.
 bool isPseudoLegalMoveLegal(Board& board, const BitMove move)
 {
+    // Warn this variable should not be created in every function call
     UndoState undo;
 
     doBitMove(board, move, undo);
@@ -123,11 +124,10 @@ template <typename Emit> int generatePawnQuietMoves(const Board& board, Emit&& e
         const Position pushOneStep = {r + dr, c};
         const Position pushTwoStep = {r + 2 * dr, c};
         const Square fromSquare = positionToSquare(fromPos);
-        const Square pushOneStepSquare = positionToSquare(pushOneStep);
-        const Square pushTwoStepSquare = positionToSquare(pushTwoStep);
 
         if (isInBoard(pushOneStep) && board.at(pushOneStep) == Piece::EMPTY)
         {
+            const Square pushOneStepSquare = positionToSquare(pushOneStep);
             if (pushOneStep.row == promoteRank)
             {
                 const Piece knight = makePiece(player, 'N');
@@ -155,6 +155,7 @@ template <typename Emit> int generatePawnQuietMoves(const Board& board, Emit&& e
         if (r == startRank && board.at(pushOneStep) == Piece::EMPTY &&
             board.at(pushTwoStep) == Piece::EMPTY)
         {
+            const Square pushTwoStepSquare = positionToSquare(pushTwoStep);
             const BitMove move = makeBitMove(
                 fromSquare, pushTwoStepSquare, Piece::EMPTY, false, false, false, false);
 
@@ -272,7 +273,7 @@ template <typename Emit> int generateEnPassants(const Board& board, Emit&& emit)
 
 template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
 {
-    // fast check.
+    // fast check
     if (board.castleRights == 0)
         return 0;
 
@@ -284,16 +285,16 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     const Position kingPos = {row, 4};
     const Square kingSquare = positionToSquare(kingPos);
 
-    // safety: king must be on e-file.
+    // safety: king must be on e-file
     if (board.at(kingPos) != makePiece(player, 'K'))
     {
         return 0;
     }
 
-    // king side.
+    // king side
     if (player == Player::WHITE)
     {
-        // white king side.
+        // white king side
         if (board.castleRights & 0b0100)
         {
             const Position f = {row, 5};
@@ -316,7 +317,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     }
     else
     {
-        // black king side.
+        // black king side
         if (board.castleRights & 0b0001)
         {
             const Position f = {row, 5};
@@ -342,7 +343,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     // queen side
     if (player == Player::WHITE)
     {
-        // white queen side.
+        // white queen side
         if (board.castleRights & 0b1000)
         {
             const Position a = {row, 0};
@@ -367,7 +368,7 @@ template <typename Emit> int generateCastling(const Board& board, Emit&& emit)
     }
     else
     {
-        // black queen side.
+        // black queen side
         if (board.castleRights & 0b0010)
         {
             const Position a = {row, 0};
@@ -398,7 +399,6 @@ int generatePseudoLegalMoves(const Board& board, BitMove* buffer, Emit&& emit)
 {
     const Player player = board.player;
 
-    // checks.
     checkBoardState(board);
 
     int cnt = 0;
@@ -472,8 +472,6 @@ int filterLegalMoves(const Board& board, BitMove* allMoves, int nAllMoves, BitMo
 
 int generateAllLegalMoves(Board& board, BitMove* buffer)
 {
-    ENGINE_ASSERT(isPlayerValid(board.player));
-
     int cnt = 0;
     generatePseudoLegalMoves(board,
                              buffer,
@@ -490,8 +488,6 @@ int generateAllLegalMoves(Board& board, BitMove* buffer)
 
 int generateLegalCaptureMoves(Board& board, BitMove* buffer)
 {
-    ENGINE_ASSERT(isPlayerValid(board.player));
-
     int cnt = 0;
     generatePseudoLegalCaptures(board,
                                 buffer,

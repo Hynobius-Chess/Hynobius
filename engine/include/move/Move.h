@@ -112,7 +112,8 @@ struct Move
 
     Position from;
     Position to;
-    Piece movePiece, capturePiece = Piece::EMPTY;
+    Piece movePiece;
+    Piece capturePiece = Piece::EMPTY;
 
     bool isPromotion = false;
     Piece promotionPiece = Piece::EMPTY;
@@ -120,11 +121,6 @@ struct Move
     Castle castle = NOT;
 
     bool isEnPassant = false;
-
-    int prevCastleRights;
-    int prevMateralPoints;
-    int prevPST;
-    uint64_t prevZobrist;
 
     bool operator==(const Move& other) const
     {
@@ -181,7 +177,7 @@ inline std::string bitMoveToUCIMove(const BitMove& move)
 {
     if (move == INVALID_BITMOVE)
     {
-        return "INVALID_BITMOVE";
+        return "0000";
     }
 
     Position from = squareToPosition(getFromSquare(move));

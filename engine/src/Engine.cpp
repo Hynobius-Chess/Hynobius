@@ -15,18 +15,18 @@
 Engine::Engine()
 {
     initZobrist();
-    board.init();
+    board.initWithStartpos();
     checkBoardState(board);
 }
 
 void Engine::setStartPosition()
 {
-    board.init();
+    board.initWithStartpos();
 }
 
 void Engine::setPositionWithFen(const std::string& fen)
 {
-    board = cinFenToBoard(fen);
+    board = fenToBoard(fen);
 }
 
 void Engine::checkReady() const {}
@@ -94,7 +94,7 @@ void Engine::quit() const {}
 
 void Engine::newGame()
 {
-    board.init();
+    board.initWithStartpos();
     for (int i = 0; i < TT_SIZE; i++)
     {
         TT[i] = {};

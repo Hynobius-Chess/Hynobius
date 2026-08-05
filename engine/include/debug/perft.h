@@ -30,6 +30,8 @@ inline PerftStats operator+(PerftStats a, const PerftStats& b)
     return a;
 }
 
+// Return perft nodes
 uint64_t perft(Board& board, int depth);
 
+// Return `PerftStats` by running perft.
 PerftStats perftWithStat(Board& board, int depth);

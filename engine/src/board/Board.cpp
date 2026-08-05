@@ -24,10 +24,10 @@ void computePiecePos(Board& board)
 
 Board::Board()
 {
-    init();
+    initWithStartpos();
 }
 
-void Board::init()
+void Board::initWithStartpos()
 {
     player = Player::WHITE;
 

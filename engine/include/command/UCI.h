@@ -2,9 +2,11 @@
 
 #include "Engine.h"
 
+// Go into UCI loop
 void uciLoop(Engine& engine);
 
-std::string UCIMoveToString(const Move& move);
+// Turn `Move` into UCI move (string)
+std::string moveToUCIMove(const Move& move);
 
 struct UCIGoLimit
 {

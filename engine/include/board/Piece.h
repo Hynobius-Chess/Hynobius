@@ -4,7 +4,7 @@
 
 #include <cctype>
 
-// Define `Piece`.
+// Define `Piece`
 enum class Piece
 {
     EMPTY = 0,
@@ -23,17 +23,17 @@ enum class Piece
     PIECE_COUNT
 };
 
-// Turn `Piece` into char.
+// Turn `Piece` into char
 inline constexpr char PIECE_TO_CHAR[]{
     '.', 'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'};
 
-// Turn [`Player`][`charToPieceIndex`] into `Piece`.
+// Turn [`Player`][`charToPieceIndex`] into `Piece`
 inline constexpr Piece MAKE_PIECE_MAP[2][6]{
     {Piece::WPAWN, Piece::WKNIGHT, Piece::WBISHOP, Piece::WROOK, Piece::WQUEEN, Piece::WKING},
     {Piece::BPAWN, Piece::BKNIGHT, Piece::BBISHOP, Piece::BROOK, Piece::BQUEEN, Piece::BKING}};
 
-// Turn char into index to support `MAKE_PIECE_MAP`.
-// - Lower and upper letter are supported.
+// Turn char into index to support `MAKE_PIECE_MAP`
+// - Lower and upper letter are supported
 inline int charToPieceIndex(const char c)
 {
     switch (std::toupper(c))
@@ -55,19 +55,19 @@ inline int charToPieceIndex(const char c)
     }
 }
 
-// Turn `Piece` to `int` safely.
+// Turn `Piece` to `int` safely
 inline int pieceToIndex(const Piece p)
 {
     return static_cast<int>(p);
 }
 
-// Check whether a piece is a piece.
+// Check whether a piece index is a piece
 inline bool isValidPieceIndex(const int index)
 {
     return (1 <= index && index <= 12 ? true : false);
 }
 
-// Turn `Piece` to `char`.
+// Turn `Piece` to `char`
 inline char pieceToChar(const Piece p)
 {
     ENGINE_ASSERT(p == Piece::EMPTY || isValidPieceIndex(pieceToIndex(p)));
@@ -75,13 +75,10 @@ inline char pieceToChar(const Piece p)
     return PIECE_TO_CHAR[pieceToIndex(p)];
 }
 
-// Check whether a piece is white.
+// Check whether a piece is white
 inline bool isWhite(const Piece p)
 {
-    if (p == Piece::EMPTY)
-    {
-        ENGINE_FATAL("piece", "empty piece does not have a color");
-    }
+    ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p)));
 
     if (pieceToIndex(Piece::WPAWN) <= pieceToIndex(p) &&
         pieceToIndex(p) <= pieceToIndex(Piece::WKING))
@@ -90,13 +87,10 @@ inline bool isWhite(const Piece p)
         return false;
 }
 
-// Check whether a piece is black.
+// Check whether a piece is black
 inline bool isBlack(const Piece p)
 {
-    if (p == Piece::EMPTY)
-    {
-        ENGINE_FATAL("piece", "empty piece does not have a color");
-    }
+    ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p)));
 
     if (pieceToIndex(Piece::BPAWN) <= pieceToIndex(p) &&
         pieceToIndex(p) <= pieceToIndex(Piece::BKING))
@@ -105,17 +99,11 @@ inline bool isBlack(const Piece p)
         return false;
 }
 
-// Check whether two pieces share the same color.
+// Check whether two pieces share the same color
 inline bool isSameColor(const Piece p1, const Piece p2)
 {
-    if (p1 == Piece::EMPTY)
-    {
-        ENGINE_FATAL("piece", "Non-piece Piece::Object does not have a color");
-    }
-    if (p2 == Piece::EMPTY)
-    {
-        ENGINE_FATAL("piece", "Non-piece Piece::Object does not have a color");
-    }
+    ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p1)));
+    ENGINE_ASSERT(isValidPieceIndex(pieceToIndex(p2)));
 
     return isWhite(p1) == isWhite(p2);
 }

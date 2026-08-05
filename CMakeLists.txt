@@ -10,17 +10,12 @@
     # add_definitions(-DENGINE_DEBUG)
 
     add_library(engine-core
-        engine/src/board/Piece.cpp
         engine/src/board/Board.cpp
         engine/src/board/Attack.cpp
         engine/src/board/Check.cpp
 
         engine/src/debug/Perft.cpp
-
-        engine/src/move/Move.cpp
-        engine/src/move/Move_Order.cpp
         engine/src/move/Generate_Move.cpp
-        engine/src/move/Make_Move.cpp
         engine/src/move/Make_BitMove.cpp
 
         engine/src/evaluate/Material_Point.cpp

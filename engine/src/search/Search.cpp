@@ -34,7 +34,7 @@ int Search::scoreMove(const Board& board, const BitMove move, const advanceMoves
 
     if (getPromotion(move))
     {
-        // 最先看
+        // searches first
         score += PROMOTION_SCORE;
         score += pieceValue(getPromotePiece(move));
     }
@@ -142,22 +142,22 @@ Search::Search(const Evaluate& _eval, const SearchLimits _limits)
     state.reset();
 }
 
-// public function to search for moves.
+// public function to search for moves
 SearchResult Search::findBestMove(const Board& board)
 {
-    // init state.
+    // init state
     state.reset();
 
-    // clear killer and history move to recover from v0.3.0-beta.2
+    // WARN should this be cleaned before every search?
     kill = killerMove{};
     history = HistoryHeuristic{};
 
-    // make copyBoard non-const.
+    // make copyBoard non-const
     Board copyBoard = board;
 
     checkBoardState(copyBoard);
 
-    // Init repetition history
+    // init repetition history
     copyBoard.pushRepetitionKey();
 
     // current result is invalid
@@ -165,7 +165,7 @@ SearchResult Search::findBestMove(const Board& board)
     result.clear();
     result = {false, -MAX_SCORE, INVALID_BITMOVE};
 
-    // At least output a valid move
+    // at least output a valid move
     BitMove rootMoves[256];
     const int nRootMoves = generateAllLegalMoves(copyBoard, rootMoves);
     if (nRootMoves > 0)
@@ -191,15 +191,15 @@ SearchResult Search::findBestMove(const Board& board)
         return result;
     }
 
-    // set max depth.
+    // set max depth
     const int maxDepth =
         limits.maxDepth == -1 ? SearchVarialble::MAX_SEARCH_DEPTH : limits.maxDepth;
 
     BitMove lastBestMove = INVALID_BITMOVE;
+
     // iterative deepening
     for (int depth = 1; depth <= maxDepth; depth++)
     {
-        // check time.
         if (shouldStop())
             break;
 
@@ -217,7 +217,6 @@ SearchResult Search::findBestMove(const Board& board)
 
             while (true)
             {
-                // check time.
                 if (shouldStop())
                     break;
 
@@ -286,14 +285,14 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
 
     SearchResult result = {false, -MAX_SCORE, INVALID_BITMOVE};
 
-    // Clear currecnt PV line
+    // clear currecnt PV line
     state.pv.clearLine(ply);
 
     // generate all moves
     BitMove* moves = moveBuffer[ply];
     int nMoves = generateAllLegalMoves(board, moves);
 
-    // Get last PV move
+    // get last PV move
     BitMove pvMove = INVALID_BITMOVE;
     if (state.prevPv.length[ply] > 0)
         pvMove = state.prevPv.table[ply][0];
@@ -306,7 +305,6 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
     {
         ENGINE_ASSERT(alpha < beta);
 
-        // time check.
         if (shouldStop())
         {
             return {false, -MAX_SCORE, INVALID_BITMOVE};
@@ -323,7 +321,6 @@ Search::chooseMove(Board& board, int depth, int alpha, int beta, int ply, const 
         undoBitMove(board, move, undoState[ply]);
 
         const Move oriMove = bitMovetoOriMove(board, move);
-        // std::cout << oriMove << " | " << score << '\n';
 
         if (score == -TIMEOUT_SCORE)
         {
@@ -359,17 +356,17 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
 
     state.stats.negamaxNodes++;
 
-    // Record original alpha for TT store.
+    // record original alpha for TT store
     const int oriAlpha = alpha;
 
-    // Clear current PV line
+    // clear current PV line
     state.pv.clearLine(ply);
 
-    // Check repetition
+    // check repetition
     if (board.isRepetition())
         return 0;
 
-    // Probe TT table.
+    // probe TT table
     TTEntry ttOut;
     int ttScore = -MAX_SCORE;
     BitMove ttMove = INVALID_BITMOVE;
@@ -408,12 +405,12 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     BitMove* moves = moveBuffer[ply];
     const int nMoves = generateAllLegalMoves(board, moves);
 
-    // Get last PV move.
+    // Get last PV move
     BitMove pvMove = INVALID_BITMOVE;
     if (state.prevPv.length[ply] > 0)
         pvMove = state.prevPv.table[ply][0];
 
-    // Sort moves.
+    // Sort moves
     advanceMoves adv = {pvMove, ttMove, kill.table[0][ply], kill.table[1][ply]};
     sortMove(board, moves, nMoves, [&](BitMove move) { return scoreMove(board, move, adv); });
 
@@ -445,7 +442,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
             !undoState[ply].isPromotion  // don't reduce promotions.
         )
         {
-            // after doBitMove, the player stored in board is already the enemy.
+            // after doBitMove, the player stored in board is already the enemy
             if (!isInCheck(board, board.player))
             {
                 doLMR = true;
@@ -458,11 +455,11 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
         {
             const int searchDepth = depth - 2;
 
-            // Using null-window to limit score window -> faster.
+            // Using null-window to limit score window -> faster
             score = -negamax(board, searchDepth, -alpha - 1, -alpha, ply + 1);
             if (score != -TIMEOUT_SCORE && score > alpha)
             {
-                // fail high -> research with full depth.
+                // fail high -> research with full depth
                 score = -negamax(board, depth - 1, -beta, -alpha, ply + 1);
             }
         }
@@ -508,7 +505,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
         }
     }
 
-    // define TT flag to store.
+    // define TT flag to store
     TTFlag flag;
     if (bestScore <= oriAlpha)
         flag = UPPER;
@@ -517,7 +514,7 @@ int Search::negamax(Board& board, int depth, int alpha, int beta, int ply)
     else
         flag = EXACT;
 
-    // store to TT table.
+    // store to TT table
     storeTT(board.zobristKey, depth, ply, bestScore, flag, bestMove);
 
     return bestScore;
@@ -569,7 +566,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
         }
     }
 
-    // Sort moves.
+    // Sort moves
     advanceMoves adv = {
         INVALID_BITMOVE,
         INVALID_BITMOVE,
@@ -582,7 +579,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
     {
         ENGINE_ASSERT(alpha < beta);
 
-        // time check.
+        // time check
         if (shouldStop())
             return TIMEOUT_SCORE;
 
@@ -595,7 +592,7 @@ int Search::quietscence(Board& board, int alpha, int beta, int ply)
 
         undoBitMove(board, move, undoState[ply]);
 
-        // time check.
+        // time check
         if (score == -TIMEOUT_SCORE)
             return TIMEOUT_SCORE;
 
