@@ -59,6 +59,7 @@ void Engine::setPlayer(Player player)
 BitMove Engine::goDepth(int depth, bool isPrintInfo)
 {
     Search search(eval, {depth, MAX_THINK_TIME});
+
     auto res = search.findBestMove(board);
 
     return res.bestBitMove;
